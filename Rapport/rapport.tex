@@ -1,0 +1,87 @@
+\documentclass[a4paper, 10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[scale=0.8]{geometry}
+\usepackage[boxed, vlined, french]{algorithm2e}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\usepackage{float}
+\usepackage{helvet}
+\usepackage{libertine}
+\usepackage{color}
+
+
+\begin{document}
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+\newcommand{\hsp}{\hspace{20pt}}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\definecolor{orange}{rgb}{0.99,0.69,0.07}
+
+  \title{Modélisation et résolution pour l'optimisation \\ Rapport \\[1ex] \large }
+  \author{Par Manon Girard \& Paul Peyssard \& Victor Tancrez}
+  \date{}
+  \maketitle
+
+  \begin{center}
+    \includegraphics[scale=0.2]{images/amu2.png}
+  \end{center}
+
+  \vfill
+  \begin{center}
+    Master 2 Intelligence Artificielle \& Apprentissage Automatique \\
+    Aix-Marseille Université \\
+  \end{center}
+  \pagebreak
+
+  \tableofcontents
+  \newpage
+
+  \section{Problèmes d'optimisation sous contraintes}
+
+    \textbf{Les données} $\forall i \in \{1,2,...,n \}$ et $\forall j \in \{1,2,...,n \}$
+    \begin{itemize}
+      \item $n$ := le nombre de stations
+      \item $k$ := le nombre de région
+      \item $\Delta_{i,j}$ := l'écart minimum entre les fréquence des stations $i$ et $j$ (possiblement nul)
+      \item $n_{i}$ := le nombre maximum de fréquences différentes utilisées pour la région $i$
+      \item $\delta_{i}$ := l'écart entre les deux fréquences de la sation $i$
+      \item $r_{i}$ := le numéro de région de la station $i$
+    \end{itemize}
+
+    \textbf{Les variables : } $\forall i \in \{1,2,...,n \}$
+    \begin{itemize}
+      \item $fe_{i}$ := la fréquence pour l'émetteur de la station $i$
+      \item $fr_{i}$ := la fréquence pour le recepteur de la station $i$
+    \end{itemize}
+
+    \textbf{Les contraintes} $\forall i,j \in \{1,2,...,n \}$, et $\forall t \in \{1,2,...,k\}$
+    \begin{itemize}
+      \item L'écart entre les deux fréquences d'une même station doit être $\delta_{i}$ :
+       $| fe_{i} - fr_{i} | = \delta{i}$
+      \item L'écart minimum à garantir entre les fréquences des stations $i$ et $j$ :
+      \begin{itemize}
+        \item $| fe_i - fe_j | \geq \Delta_{i,j}$
+        \item $| fe_i - fr_j | \geq \Delta_{i,j}$
+        \item $| fr_i - fe_j | \geq \Delta_{i,j}$
+        \item $| fr_i - fr_j | \geq \Delta_{i,j}$
+      \end{itemize}
+      \item Le nombre de fréquence différentes pour la région $t$ est au maximum $n_t$ : $nValues(\{fr_{i}, fe_{i} | \forall i \in \{1,2,...,n \}, r_{i} = t \}, \geq, n_{t})$
+    \end{itemize}
+
+    \subsection{Cas 1 : Minimisation du nombre de fréquence utilisées}
+
+      Dans ce cas, la fonction objective est :
+      $$ \displaystyle{ \min_{n \in \mathbb{N}}  nValue(\{ e_{i,j}, r_{i,j} | \forall i \in \{1,2,...,n \}, \forall j \in \{1,2,...,k\}, =, n) }$$
+
+    \subsection{Cas 2 : Utilisation des fréquences les plus basses}
+
+    \subsection{Cas 3 : Minimiser la largeur de la bande de fréquence utilisées}
+
+
+
+
+\end{document}

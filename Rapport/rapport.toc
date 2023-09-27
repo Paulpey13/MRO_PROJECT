@@ -1,0 +1,4 @@
+\contentsline {section}{\numberline {1}Problèmes d'optimisation sous contraintes}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Cas 1 : Minimisation du nombre de fréquence utilisées}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Cas 2 : Utilisation des fréquences les plus basses}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Cas 3 : Minimiser la largeur de la bande de fréquence utilisées}{3}{subsection.1.3}%
