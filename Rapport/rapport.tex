@@ -69,19 +69,68 @@
         \item $| fr_i - fe_j | \geq \Delta_{i,j}$
         \item $| fr_i - fr_j | \geq \Delta_{i,j}$
       \end{itemize}
-      \item Le nombre de fréquence différentes pour la région $t$ est au maximum $n_t$ : $nValues(\{fr_{i}, fe_{i} | \forall i \in \{1,2,...,n \}, r_{i} = t \}, \geq, n_{t})$
+      \item Le nombre de fréquence différentes pour la région $t$ est au maximum $n_t$ : $nValues(\{fr_{i}, fe_{i} | \forall i \in \{1,2,...,n \}, r_{i} = t \}, \leq, n_{t})$
+      \item Si les stations $i$ et $j$ doivent pouvoir communiquer:
+      $fr_i = fe_j$ et $fe_i = fr_j$
     \end{itemize}
 
     \subsection{Cas 1 : Minimisation du nombre de fréquence utilisées}
 
       Dans ce cas, la fonction objective est :
-      $$ \displaystyle{ \min_{n \in \mathbb{N}}  nValue(\{ e_{i,j}, r_{i,j} | \forall i \in \{1,2,...,n \}, \forall j \in \{1,2,...,k\}, =, n) }$$
+      $$ \displaystyle{ \min_{n \in \mathbb{N}}  nValue(\{ e_{i}, r_{i} | \forall i \in \{1,2,...,n \}, =, n) }$$
 
     \subsection{Cas 2 : Utilisation des fréquences les plus basses}
 
+      Dans ce cas,
+      $$ \displaystyle{\min_{n \in \mathbb{N}} \sum_{i=1}^{n} fe_i + fr_i } $$
+
+      Option2
+      Dans ce cas,
+      $$ \displaystyle{\min \{ \min \{ \max_{i} fe_i , \max_{i} fr_i \} \}} $$
+
     \subsection{Cas 3 : Minimiser la largeur de la bande de fréquence utilisées}
 
+      Dans ce cas,
+      $$ \displaystyle{ \min_{} | \max_{} \{\max_{j} fe_j, \max_{j} fr_j\}  - \min_{} \{\min_{j} fe_j, \min_{j} fr_j\}  |} $$
 
+  \section{Problèmes de satisfaction de contraintes valués}
+
+  \textbf{Les contraintes} $\forall i,j \in \{1,2,...,n \}$, et $\forall t \in \{1,2,...,k\}$
+  \begin{itemize}
+    \item L'écart entre les deux fréquences d'une même station doit être $\delta_{i}$ :
+     $| fe_{i} - fr_{i} | = \delta{i}$ -> \color{green} 0 \color{red} + $\infty$ \color{black}
+    \item L'écart minimum à garantir entre les fréquences des stations $i$ et $j$ (Dures pour toutes les stations qu'on veut en liaison et grosse molles pour le reste ) :
+    \begin{itemize}
+      \item $| fe_i - fe_j | \geq \Delta_{i,j}$
+      \item $| fe_i - fr_j | \geq \Delta_{i,j}$
+      \item $| fr_i - fe_j | \geq \Delta_{i,j}$
+      \item $| fr_i - fr_j | \geq \Delta_{i,j}$
+    \end{itemize}
+    \item Le nombre de fréquence différentes pour la région $t$ est au maximum $n_t$ : $nValues(\{fr_{i}, fe_{i} | \forall i \in \{1,2,...,n \}, r_{i} = t \}, \leq, n_{t})$ 0 pour inférieur à $n_t$ et après ensuite 1 à chaque nouvelle station (donner un maximum pour pas faire exploser le nombre de fréquence)
+    \item Si les stations $i$ et $j$ doivent pouvoir communiquer:
+    $fr_i = fe_j$ et $fe_i = fr_j$  \color{green} 0 \color{red} + $\infty$ \color{black}
+  \end{itemize}
+
+  Contraintes dures 2 pour toutes les stations devan être en liaisons.
+
+  \subsection{Cas 2 }
+
+    \textbf{Les contraintes} $\forall i,j \in \{1,2,...,n \}$, et $\forall t \in \{1,2,...,k\}$
+    \begin{itemize}
+      \item L'écart entre les deux fréquences d'une même station doit être $\delta_{i}$ :
+       $| fe_{i} - fr_{i} | = \delta{i}$ -> \color{green} 0 \color{red} + $\infty$ \color{black}
+      \item L'écart minimum à garantir entre les fréquences des stations $i$ et $j$ :
+      \begin{itemize}
+        \item $| fe_i - fe_j | \geq \Delta_{i,j}$
+        \item $| fe_i - fr_j | \geq \Delta_{i,j}$
+        \item $| fr_i - fe_j | \geq \Delta_{i,j}$
+        \item $| fr_i - fr_j | \geq \Delta_{i,j}$
+      \end{itemize}
+      \item Le nombre de fréquence différentes pour la région $t$ est au maximum $n_t$ : $nValues(\{fr_{i}, fe_{i} | \forall i \in \{1,2,...,n \}, r_{i} = t \}, \leq, n_{t})$
+      \item Si les stations $i$ et $j$ doivent pouvoir communiquer:
+      $fr_i = fe_j$ et $fe_i = fr_j$
+      \item On veut maximiser le nombre de liaison :  $\displaystyle{ \max_{n} nValues(\{ (i,j) | i<j, fe_i = fr_j fe_j = fr_i \}, =,n)}$ -->
+  \end{itemize}
 
 
 \end{document}

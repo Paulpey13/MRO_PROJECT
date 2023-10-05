@@ -79,7 +79,7 @@ satisfy (
 
 # La fonction objective
 minimize(
-    NValues(fe+fr)
+    Sum(fe+fr)
 )
 
 #Si c'est satisfiable, on imprime la solution
