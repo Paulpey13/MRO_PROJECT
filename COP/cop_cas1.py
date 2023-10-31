@@ -83,5 +83,9 @@ minimize(
 )
 
 #Si c'est satisfiable, on imprime la solution
-# if solve() is SAT:
-#     print(values(x))
+if solve() is OPTIMUM:
+    FE = values(fe)
+    FR = values(fr)
+    for i in range(len(fe)):
+        print("Station ",i," fe ",FE[i]," fr ",FR[i])
+    print("Nombre de fréquence différentes ",len(set(FE+FR)))
