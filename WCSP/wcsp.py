@@ -5,18 +5,11 @@ from itertools import product
 
 data_file = sys.argv[1].replace("-data=./",'')
 
-# with open(data_file) as file:
-#     data = json.load(file)
-
 stations = data.stations
 regions= data.regions
 interferences = data.interferences
 liaisons = data.liaisons
 
-# stations = data["stations"]
-# regions= data["regions"]
-# interferences = data["interferences"]
-# liaisons = data["liaisons"]
 nb_station = len(stations)
 k = len(regions)
 
@@ -96,11 +89,11 @@ max_size_domain, size_domain, domain = max_size_domain_and_size_domain()
 
 # --- ECRITURE DU FORMAT WCSP
 
-name_file = "wcsp_"+data_file
+name_file = data_file.replace(".json",".wcsp")
 format_wcsp = open(name_file, "w+")
 
 # Première ligne : nom de l'instance nombre de variable taille maximale des domaines nombre de fonction de coût
-format_wcsp.write(name_file+" "+str(n_var)+" "+str(size_domain)+" "+str(n_cost_fct)+" "+str(maj)+"\n")
+format_wcsp.write(name_file+" "+str(n_var)+" "+str(size_domain).replace("[", "").replace(",","").replace("]","")+" "+str(n_cost_fct)+" "+str(maj)+"\n")
 
 # Deuxième ligne: taille de domaine de chaque variables
 for i in range(len(domain)):
@@ -233,33 +226,6 @@ for [stat1, stat2, Delta] in interferences:
                     format_wcsp.write(str(fr1)+" "+str(fr2)+" 0\n")
 
 
-# Nombre de fréquence difféentes pour chaque région
-for reg in range(len(regions)):
-    len(dom_R[reg])
-    tuples = list(product(*dom_R[reg]))
-    print("ok")
-    print(len(tuples))
-
-    nb_couple = 0
-    tuples_no_ok = []
-    for tuple in tuples:
-        diff = len(set(tuple))
-        if diff >= regions[reg]:
-            nb_couple += 1
-            tuples_no_ok.append([tuple, diff])
-
-    print(nb_couple)
-    # Arité de la fonction | numéro de vairables impliqué | Coût par défault | nombre de tuple listé après
-    format_wcsp.write(""+str(len(R[reg])))
-    for stat in R[reg]:
-        format_wcsp.write(" "+str(stat))
-    format_wcsp.write(" 0 "+str(nb_couple)+"\n")
-
-    for tuple in tuples_no_ok:
-            # Tuple | coût associé
-            format_wcsp.write(' '.join(map(str, tuple[0]))+" "+str(tuple[1])+"\n")
-
-
 # Condition pour les stations qui doivent communiquer
 for [stat1, stat2] in liaisons:
     FE1 = set(domain_fe(stat1))
@@ -270,7 +236,7 @@ for [stat1, stat2] in liaisons:
     nb_couple = len(FE1.intersection(FR2)) +  len(FE2.intersection(FR1))
 
     # Arité de la fonction | numéro de vairables impliqué | Coût par défault | nombre de tuple listé après
-    format_wcsp.write("4 "+str(2*stat1)+" "+str(2*stat1+1)+" "+str(2*stat2)+" "+str(2*stat2+1)+" "+str(maj)+" "+nb_couple+"\n")
+    format_wcsp.write("4 "+str(2*stat1)+" "+str(2*stat1+1)+" "+str(2*stat2)+" "+str(2*stat2+1)+" "+str(maj)+" "+str(nb_couple)+"\n")
 
     for fe1 in FE1:
         for fr1 in FR1:
