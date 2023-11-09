@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-for FILE in $(ls ./donnees_cop/*)
+for FILE in $(ls ./donnees_cop/*.json)
 do
   for SOL in 'choco' 'ace'
     do
