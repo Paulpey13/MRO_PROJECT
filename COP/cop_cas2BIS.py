@@ -88,4 +88,4 @@ if solve() is OPTIMUM:
     FR = values(fr)
     for i in range(len(fe)):
         print("Station ",i," fe ",FE[i]," fr ",FR[i])
-    print("Plus grande fréquence utilisées ",max(max(FE), max(FR))))
+    print("Plus grande fréquence utilisées ",max(max(FE), max(FR)))
