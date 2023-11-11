@@ -3,7 +3,7 @@ from pycsp3 import *
 import sys
 from itertools import product
 
-data_file = sys.argv[1].replace("-data=./",'')
+data_file = sys.argv[1].replace("-data=",'')
 
 stations = data.stations
 regions= data.regions
@@ -80,7 +80,7 @@ def max_size_domain_and_size_domain():
 n_var = 2*nb_station
 
 # Nombre de fonction de coût # Nb de contraintes
-n_cost_fct = nb_station + 4*len(interferences)
+n_cost_fct = nb_station + 4*len(interferences) + len(liaisons)
 
 # Majorant initil
 maj = 1000
@@ -89,11 +89,13 @@ max_size_domain, size_domain, domain = max_size_domain_and_size_domain()
 
 # --- ECRITURE DU FORMAT WCSP
 
+
 name_file = data_file.replace(".json",".wcsp")
 format_wcsp = open(name_file, "w+")
 
+
 # Première ligne : nom de l'instance nombre de variable taille maximale des domaines nombre de fonction de coût
-format_wcsp.write(name_file+" "+str(n_var)+" "+str(size_domain).replace("[", "").replace(",","").replace("]","")+" "+str(n_cost_fct)+" "+str(maj)+"\n")
+format_wcsp.write(name_file+" "+str(n_var)+" "+str(max(size_domain))+" "+str(n_cost_fct)+" "+str(maj)+"\n")
 
 # Deuxième ligne: taille de domaine de chaque variables
 for i in range(len(domain)):
@@ -104,142 +106,164 @@ format_wcsp.write("\n")
 
 #Contrainte d'écart entre deux fréquences d'une même stations (dure)
 for stat in range(nb_station):
+    fe_stat = domain_fe(stat)
+    fr_stat = domain_fr(stat)
+    nb_couple = 0
+    for fei in range(len(fe_stat)):
+        for fri in range(len(fr_stat)):
+            if abs(fe_stat[fei] - fr_stat[fri]) == delta[stat]:
+                nb_couple += 1
     # Arité de la fonction | numéro de vairables impliqué | Coût par défault | nombre de tuple listé après
-    format_wcsp.write("2 "+str(2*stat)+" "+str(2*stat+1)+" "+str(maj)+" 1\n")
-    for fei in domain_fe(stat):
-        for fri in domain_fr(stat):
-            if abs(fei - fri) == delta[stat]:
+    format_wcsp.write("2 "+str(2*stat)+" "+str(2*stat+1)+" "+str(maj)+" "+str(nb_couple)+"\n")
+    for fei in range(len(fe_stat)):
+        for fri in range(len(fr_stat)):
+            if abs(fe_stat[fei] - fr_stat[fri]) == delta[stat]:
                 # Tuple | coût associé
                 format_wcsp.write(str(fei)+" "+str(fri)+" 0\n")
 
 # Ecart minimum entre les fréquences de deux stations possèdant des interferences
 for [stat1, stat2, Delta] in interferences:
+    fe_s1 = domain_fe(stat1)
+    fe_s2 = domain_fe(stat2)
+    fr_s1 = domain_fr(stat1)
+    fr_s2 = domain_fr(stat2)
     #Si les stations sont en liaisons on a une contrainte dure
     if [stat1, stat2] in liaisons:
         nb_couple = 0
-        for fe1 in domain_fe(stat1):
-            for fe2 in domain_fe(stat2):
-                if abs(fe1 - fe2) >= Delta :
+
+        for fe1 in range(len(fe_s1)):
+            for fe2 in range(len(fe_s2)):
+                if abs(fe_s1[fe1] - fe_s2[fe2]) >= Delta :
                     nb_couple +=1
         # Arité de la fonction | numéro de vairables impliqué | Coût par défault | nombre de tuple listé après
         format_wcsp.write("2 "+str(2*stat1)+" "+str(2*stat2)+" "+str(maj)+" "+str(nb_couple)+" \n")
-        for fe1 in domain_fe(stat1):
-            for fe2 in domain_fe(stat2):
-                if abs(fe1 - fe2) >= Delta :
+        for fe1 in range(len(fe_s1)):
+            for fe2 in range(len(fe_s2)):
+                if abs(fe_s1[fe1] - fe_s2[fe2])  >= Delta :
                     # Tuple | coût associé
                     format_wcsp.write(str(fe1)+" "+str(fe2)+" 0\n")
 
         nb_couple = 0
-        for fe1 in domain_fe(stat1):
-            for fr2 in domain_fr(stat2):
-                if abs(fe1-fr2) >= Delta :
+        for fe1 in range(len(fe_s1)):
+            for fr2 in range(len(fr_s2)):
+                if abs(fe_s1[fe1]-fr_s2[fr2]) >= Delta :
                     nb_couple +=1
         # Arité de la fonction | numéro de vairables impliqué | Coût par défault | nombre de tuple listé après
         format_wcsp.write("2 "+str(2*stat1)+" "+str(2*stat2+1)+" "+str(maj)+" "+str(nb_couple)+"\n")
-        for fe1 in domain_fe(stat1):
-            for fr2 in domain_fr(stat2):
-                if abs(fe1-fr2) >= Delta :
+        for fe1 in range(len(fe_s1)):
+            for fr2 in range(len(fr_s2)):
+                if abs(fe_s1[fe1]-fr_s2[fr2]) >= Delta :
                     # Tuple | coût associé
                     format_wcsp.write(str(fe1)+" "+str(fr2)+" 0\n")
 
 
         nb_couple = 0
-        for fr1 in domain_fr(stat1):
-            for fe2 in domain_fe(stat2):
-                if abs(fr1-fe2) >= Delta :
+        for fr1 in range(len(fr_s1)):
+            for fe2 in range(len(fe_s2)):
+                if abs(fr_s1[fr1]-fe_s2[fe2]) >= Delta :
                     nb_couple +=1
         # Arité de la fonction | numéro de vairables impliqué | Coût par défault | nombre de tuple listé après
         format_wcsp.write("2 "+str(2*stat1+1)+" "+str(2*stat2)+" "+str(maj)+" "+str(nb_couple)+"\n")
-        for fr1 in domain_fr(stat1):
-            for fe2 in domain_fe(stat2):
-                if abs(fr1-fe2) >= Delta :
+        for fr1 in range(len(fr_s1)):
+            for fe2 in range(len(fe_s2)):
+                if abs(fr_s1[fr1]-fe_s2[fe2]) >= Delta :
                     # Tuple | coût associé
                     format_wcsp.write(str(fr1)+" "+str(fe2)+" 0\n")
 
         nb_couple = 0
-        for fr1 in domain_fr(stat1):
-            for fr2 in domain_fr(stat2):
-                if abs(fr1-fr2) >= Delta :
+        for fr1 in range(len(fr_s1)):
+            for fr2 in range(len(fr_s2)):
+                if abs(fr_s1[fr1]-fr_s2[fr2]) >= Delta :
                     nb_couple +=1
         # Arité de la fonction | numéro de vairables impliqué | Coût par défault | nombre de tuple listé après
         format_wcsp.write("2 "+str(2*stat1+1)+" "+str(2*stat2+1)+" "+str(maj)+" "+str(nb_couple)+"\n")
-        for fr1 in domain_fr(stat1):
-            for fr2 in domain_fr(stat2):
-                if abs(fr1-fr2) >= Delta :
+        for fr1 in range(len(fr_s1)):
+            for fr2 in range(len(fr_s2)):
+                if abs(fr_s1[fr1]-fr_s2[fr2])  >= Delta :
                     # Tuple | coût associé
                     format_wcsp.write(str(fr1)+" "+str(fr2)+" 0\n")
     else:
         cost = 1 # Coup de la contrainte
 
         nb_couple = 0
-        for fe1 in domain_fe(stat1):
-            for fe2 in domain_fe(stat2):
-                if abs(fe1 - fe2) >= Delta :
+        for fe1 in range(len(fe_s1)):
+            for fe2 in range(len(fe_s2)):
+                if abs(fe_s1[fe1] - fe_s2[fe2]) >= Delta :
                     nb_couple +=1
         # Arité de la fonction | numéro de vairables impliqué | Coût par défault | nombre de tuple listé après
         format_wcsp.write("2 "+str(2*stat1)+" "+str(2*stat2)+" "+str(cost)+" "+str(nb_couple)+" \n")
-        for fe1 in domain_fe(stat1):
-            for fe2 in domain_fe(stat2):
-                if abs(fe1 - fe2) >= Delta :
+        for fe1 in range(len(fe_s1)):
+            for fe2 in range(len(fe_s2)):
+                if abs(fe_s1[fe1] - fe_s2[fe2]) >= Delta :
                     # Tuple | coût associé
                     format_wcsp.write(str(fe1)+" "+str(fe2)+" 0\n")
 
         nb_couple = 0
-        for fe1 in domain_fe(stat1):
-            for fr2 in domain_fr(stat2):
-                if abs(fe1-fr2) >= Delta :
+        for fe1 in range(len(fe_s1)):
+            for fr2 in range(len(fr_s2)):
+                if abs(fe_s1[fe1]-fr_s2[fr2]) >= Delta :
                     nb_couple += 1
         # Arité de la fonction | numéro de vairables impliqué | Coût par défault | nombre de tuple listé après
         format_wcsp.write("2 "+str(2*stat1)+" "+str(2*stat2+1)+" "+str(cost)+" "+str(nb_couple)+" \n")
-        for fe1 in domain_fe(stat1):
-            for fr2 in domain_fr(stat2):
-                if abs(fe1-fr2) >= Delta :
+        for fe1 in range(len(fe_s1)):
+            for fr2 in range(len(fr_s2)):
+                if abs(fe_s1[fe1]-fr_s2[fr2])  >= Delta :
                     # Tuple | coût associé
                     format_wcsp.write(str(fe1)+" "+str(fr2)+" 0\n")
 
         nb_couple = 0
-        for fr1 in domain_fr(stat1):
-            for fe2 in domain_fe(stat2):
-                if abs(fr1-fe2) >= Delta :
+        for fr1 in range(len(fr_s1)):
+            for fe2 in range(len(fe_s2)):
+                if abs(fr_s1[fr1]-fe_s2[fe2]) >= Delta :
                     nb_couple += 1
         # Arité de la fonction | numéro de vairables impliqué | Coût par défault | nombre de tuple listé après
         format_wcsp.write("2 "+str(2*stat1+1)+" "+str(2*stat2)+" "+str(cost)+" "+str(nb_couple)+" \n")
-        for fr1 in domain_fr(stat1):
-            for fe2 in domain_fe(stat2):
-                if abs(fr1-fe2) >= Delta :
+        for fr1 in range(len(fr_s1)):
+            for fe2 in range(len(fe_s2)):
+                if abs(fr_s1[fr1]-fe_s2[fe2]) >= Delta :
                     # Tuple | coût associé
                     format_wcsp.write(str(fr1)+" "+str(fe2)+" 0\n")
 
         nb_couple = 0
-        for fr1 in domain_fr(stat1):
-            for fr2 in domain_fr(stat2):
-                if abs(fr1-fr2) >= Delta :
+        for fr1 in range(len(fr_s1)):
+            for fr2 in range(len(fr_s2)):
+                if abs(fr_s1[fr1]-fr_s2[fr2]) >= Delta :
                     nb_couple += 1
 
 
         # Arité de la fonction | numéro de vairables impliqué | Coût par défault | nombre de tuple listé après
         format_wcsp.write("2 "+str(2*stat1+1)+" "+str(2*stat2+1)+" "+str(cost)+" "+str(nb_couple)+" \n")
-        for fr1 in domain_fr(stat1):
-            for fr2 in domain_fr(stat2):
-                if abs(fr1-fr2) >= Delta :
+        for fr1 in range(len(fr_s1)):
+            for fr2 in range(len(fr_s2)):
+                if abs(fr_s1[fr1]-fr_s2[fr2])  >= Delta :
                     # Tuple | coût associé
                     format_wcsp.write(str(fr1)+" "+str(fr2)+" 0\n")
 
-
 # Condition pour les stations qui doivent communiquer
 for [stat1, stat2] in liaisons:
-    FE1 = set(domain_fe(stat1))
-    FR1 = set(domain_fr(stat1))
-    FE2 = set(domain_fe(stat2))
-    FR2 = set(domain_fr(stat2))
+    FE1 = domain_fe(stat1)
+    FR1 = domain_fr(stat1)
+    FE2 = domain_fe(stat2)
+    FR2 = domain_fr(stat2)
 
-    nb_couple = len(FE1.intersection(FR2)) +  len(FE2.intersection(FR1))
-
+    nb_couple = 0
+    for fe1 in range(len(FE1)):
+        for fr1 in range(len(FR1)):
+            for fe2 in range(len(FE2)):
+                for fr2 in range(len(FR2)):
+                    if FE1[fe1] == FR2[fr2] and FR1[fr1] == FE2[fe2]:
+                        nb_couple += 1
     # Arité de la fonction | numéro de vairables impliqué | Coût par défault | nombre de tuple listé après
     format_wcsp.write("4 "+str(2*stat1)+" "+str(2*stat1+1)+" "+str(2*stat2)+" "+str(2*stat2+1)+" "+str(maj)+" "+str(nb_couple)+"\n")
 
-    for fe1 in FE1:
-        for fr1 in FR1:
-            if fe1 in FR2  and fr1 in FE2:
-                # Tuple | coût associé
-                format_wcsp.write(str(fe1)+" "+str(fr1)+" "+str(fr1)+" "+str(fe1)+" 0\n")
+    for fe1 in range(len(FE1)):
+        for fr1 in range(len(FR1)):
+            for fe2 in range(len(FE2)):
+                for fr2 in range(len(FR2)):
+                    if FE1[fe1] == FR2[fr2] and FR1[fr1] == FE2[fe2]:
+                        # Tuple | coût associé
+                        format_wcsp.write(str(fe1)+" "+str(fr1)+" "+str(fr2)+" "+str(fe2)+" 0\n")
+
+
+
+format_wcsp.close()
