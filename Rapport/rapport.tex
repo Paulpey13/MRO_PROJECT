@@ -1,7 +1,7 @@
 \documentclass[a4paper, 10pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[scale=0.8]{geometry}
+\usepackage[scale=0.9]{geometry}
 \usepackage[boxed, vlined, french]{algorithm2e}
 \usepackage{hyperref}
 \usepackage{graphicx}
@@ -11,6 +11,7 @@
 \usepackage{float}
 \usepackage{helvet}
 \usepackage{libertine}
+\usepackage{xcolor}
 \usepackage{color}
 
 
@@ -42,104 +43,268 @@
 
   \section{Problèmes d'optimisation sous contraintes}
 
-    \textbf{Les données} $\forall i \in \{1,2,...,n \}$ et $\forall j \in \{1,2,...,n \}$
-    \begin{itemize}
-      \item $n$ := le nombre de stations
-      \item $k$ := le nombre de région
-      \item $\Delta_{i,j}$ := l'écart minimum entre les fréquence des stations $i$ et $j$ (possiblement nul)
-      \item $n_{i}$ := le nombre maximum de fréquences différentes utilisées pour la région $i$
-      \item $\delta_{i}$ := l'écart entre les deux fréquences de la sation $i$
-      \item $r_{i}$ := le numéro de région de la station $i$
-    \end{itemize}
+    \subsection{Modélisation du problème}
 
-    \textbf{Les variables : } $\forall i \in \{1,2,...,n \}$
-    \begin{itemize}
-      \item $fe_{i}$ := la fréquence pour l'émetteur de la station $i$
-      \item $fr_{i}$ := la fréquence pour le recepteur de la station $i$
-    \end{itemize}
-
-    \textbf{Les contraintes} $\forall i,j \in \{1,2,...,n \}$, et $\forall t \in \{1,2,...,k\}$
-    \begin{itemize}
-      \item L'écart entre les deux fréquences d'une même station doit être $\delta_{i}$ :
-       $| fe_{i} - fr_{i} | = \delta{i}$
-      \item L'écart minimum à garantir entre les fréquences des stations $i$ et $j$ :
+      Pour chaque instance du problème, nous disposons de diverses informations que nous regroupons par les notations suivantes.
+      On note $n$ le nombre de stations et $k$ le nombre de région de l'instance du problème. De plus, on note $L$ l'ensemble des couples de stations qui souhaite être en liaisons
+      Soit $i \in \{1,2,...,n \}$, on note :
       \begin{itemize}
-        \item $| fe_i - fe_j | \geq \Delta_{i,j}$
-        \item $| fe_i - fr_j | \geq \Delta_{i,j}$
-        \item $| fr_i - fe_j | \geq \Delta_{i,j}$
-        \item $| fr_i - fr_j | \geq \Delta_{i,j}$
+        \item Pour $ j \in \{1,2,...,n \}, i<j$, $\Delta_{i,j}$ qui correspond à l'écart minimum entre les fréquences des stations $i$ et $j$. Cette valeur est nulle par défault, et est non nulle si elle est renseignée dans les données.
+        \item $n_{i}$ le nombre maximum de fréquences différentes utilisées pour la région $i$
+        \item $\delta_{i}$ l'écart entre les deux fréquences de la sation $i$
+        \item $r_{i}$ le numéro de région de la station $i$
       \end{itemize}
-      \item Le nombre de fréquence différentes pour la région $t$ est au maximum $n_t$ : $nValues(\{fr_{i}, fe_{i} | \forall i \in \{1,2,...,n \}, r_{i} = t \}, \leq, n_{t})$
-      \item Si les stations $i$ et $j$ doivent pouvoir communiquer:
-      $fr_i = fe_j$ et $fe_i = fr_j$
-    \end{itemize}
 
-    \subsection{Cas 1 : Minimisation du nombre de fréquence utilisées}
+      Ainsi, nous pouvons définir l'instance $\mathcal{P} = (X, D, C, f)$ avec :
+      \begin{itemize}
+        \item $X = \{ fe_i, fr_i | \forall i \in \{1,2,...,n\}$ tel que $\forall i \in \{1,2,...,n\}$:
+              \begin{itemize}
+                \item $fe_{i}$ correspond à la fréquence pour l'émetteur de la station $i$.
+                \item $fr_{i}$ correspond à la fréquence pour le recepteur de la station $i$.
+              \end{itemize}
+        \item $D = \{d_{fe_i}, d_{fr_i} | \forall i \in \{1,2,...,n\} \}$ où, $\forall i \in \{1,2,...,n\}$
+              \begin{itemize}
+                \item $d_{fe_i}$ correspond à l'ensemble des valeurs de fréquences possibles pour la fréquence émetrice de la station $i$. Cet ensemble de valeur se retrouve dans le fichier de données.
+                \item $d_{fr_i}$ correspond à l'ensemble des valeurs de fréquences possibles pour la fréquence receptrice de la station $i$. Cet ensemble de valeur se retrouve dans le fichier de données.
+              \end{itemize}
+        \item $C = C_1 \cup C_2 \cup C_3 \cup C_4 $ où :
+              \begin{itemize}
+                \item $C_1$ modélise la contrainte que l'écart entre les deux fréquences d'une même station $i$ doit être $\delta_{i}$.\\
+                 On note $C_{1,i} := \{ (d_{fe_i},d_{fr_i})~ tels~que~ | fe_{i} - fr_{i} | = \delta{i} \}$. \\
+                 Ainsi, $\displaystyle{C_1 = \bigcup_{i=1}^{n} C_{1,i}}$
+                \item $C_2$ modélise l'écart minimum à garantir entre les fréquences de deux stations $i$ et $j$, on note :
+                      \begin{itemize}
+                        \item $C_{2A,i,j} := \{(d_{fe_i},d_{fe_j},d_{fr_i},d_{fr_j}) ~tels~que~ | d_{fe_i} - d_{fe_j} | \geq \Delta_{i,j} \}$
+                        \item $C_{2B,i,j} := \{(d_{fe_i},d_{fe_j},d_{fr_i},d_{fr_j}) ~tels~que~ | d_{fe_i} - d_{fr_j} | \geq \Delta_{i,j} \}$
+                        \item $C_{2C,i,j} := \{(d_{fe_i},d_{fe_j},d_{fr_i},d_{fr_j}) ~tels~que~| d_{fr_i} - d_{fe_j} | \geq \Delta_{i,j} \}$
+                        \item $C_{2D,i,j} := \{(d_{fe_i},d_{fe_j},d_{fr_i},d_{fr_j}) ~tels~que~ | d_{fr_i} - d_{fr_j} | \geq \Delta_{i,j} \}$
+                      \end{itemize}
+                      Ainsi, $\displaystyle{C_2 = \bigcup_{i=1}^{n} C_{2A,i,j} \cup C_{2B,i,j} \cup C_{2C,i,j}  \cup C_{2D,i,j}}$
+                \item $C_3$ modèlise que le nombre de fréquence différentes pour la région $t$ est au maximum $n_t$. \\
+                      On note, $C_{3,t} = nValues(\{fr_{i}, fe_{i} | \forall i \in \{1,2,...,n \}, r_{i} = t \}, \leq, n_{t})$. \\
+                      Ainsi, $\displaystyle{C_3 = \bigcup_{t=1}^{k} C_{3,t}}$
+                \item $C_4$ modélise que si les stations $i$ et $j$ doivent pouvoir communiquer, alors la fréquence émétrice de l'une correspond à la fréquence receptice de l'autre, et inversement. \\
+                On note, $\displaystyle{ C_{4,r} := \{ (d_{fe_i},d_{fe_j},d_{fr_i},d_{fr_j})~tels~que~d_{fr_i} = d_{fe_j}~et~d_{fe_i} = d_{fr_j} \} }$ \\
+                Ainsi, $\displaystyle{C_4 = \bigcup_{r=1}^{|L|} C_{4,r}}$
 
-      Dans ce cas, la fonction objective est :
-      $$ \displaystyle{ \min_{n \in \mathbb{N}}  nValue(\{ e_{i}, r_{i} | \forall i \in \{1,2,...,n \}, =, n) }$$
+              \end{itemize}
 
-    \subsection{Cas 2 : Utilisation des fréquences les plus basses}
+          \item $f$ est la fonction objectif va dépendre du cas dans lequel on se trouve. Nous allons donner sa définition dans chaque cas dans les sous-parties suivantes.
+      \end{itemize}
 
-      Dans ce cas,
-      $$ \displaystyle{\min_{n \in \mathbb{N}} \sum_{i=1}^{n} fe_i + fr_i } $$
 
-      Option2
-      Dans ce cas,
-      $$ \displaystyle{\min \{ \min \{ \max_{i} fe_i , \max_{i} fr_i \} \}} $$
 
-    \subsection{Cas 3 : Minimiser la largeur de la bande de fréquence utilisées}
+      \subsubsection{Cas 1 : Minimisation du nombre de fréquence utilisées}
 
-      Dans ce cas,
-      $$ \displaystyle{ \min_{} | \max_{} \{\max_{j} fe_j, \max_{j} fr_j\}  - \min_{} \{\min_{j} fe_j, \min_{j} fr_j\}  |} $$
+        Dans le premier cas, nous souhaitons minimiser le nombre de fréquence utilisées. Pour ce faire, nous avons choisit de définir la fonction objectif comme suit :
+        $$ \displaystyle{ \min_{n \in \mathbb{N}}  nValue(\{ e_{i}, r_{i} | \forall i \in \{1,2,...,n \}, =, m) }$$
+
+        Intuitivement, la contrainte globale $nValue$ permet de fixer le nombre de valeur de fréquence différente, émétrice et receptrice mélangées, à $m$. Ainsi, on souhaite minimiser la valeur de $m$, ce qui correspond à notre problème.
+
+      \subsubsection{Cas 2 : Utilisation des fréquences les plus basses}
+
+        Dans ce deuxième cas, l'objectif est d'utilisées les valeurs de fréquences les plus basses possibles. Pour ce cas, nous avons eu deux point de vue différent. Ainsi, nous avons définit deux fonctions objectifs différentes. Les voici :
+        \begin{itemize}
+          \item On parlera ici du $CAS 2$. On définit la fonction objectif suivant :
+                $$ \displaystyle{\min_{n \in \mathbb{N}} \sum_{i=1}^{n} fe_i + fr_i } $$
+
+                Intuitivement, (là je sais pas quoi dire, c'était pas mon idée cette fonction farfelues, donc si toi t'as une idée de justification... :') )
+           \item On parlera dans ce cas du $CAS 2BIS$. On définit la fonction objetif par :
+                 $$ \displaystyle{\min \{ \max \{ \max_{i} fe_i , \max_{i} fr_i \} \}} $$
+                 Intuitivement, on prend la plus grande valeur des fréquences émétrice, de même pour les fréquences receptrice, et on prends la plus grande des deux, et on tente de la rendre la plus petite possibles. Ainsi, on prend la valeur de fréquence la plus grande qu'on tente de minimiser, ce qui va forcer tous les autres à être les plus petites possibles aussi.
+        \end{itemize}
+
+      \subsubsection{Cas 3 : Minimiser la largeur de la bande de fréquence utilisées}
+
+        Dans ce troisième et dernier cas, on souhaite minimiser la largeur de la bande de fréquence utilisées, c'est-à-dire l'écart entre la plus basse et la plus haute des fréquences. Intuitivement celà se traduit par la fonction objectif suivante :
+        $$ \displaystyle{ \min_{} | \max_{} \{\max_{j} fe_j, \max_{j} fr_j\}  - \min_{} \{\min_{j} fe_j, \min_{j} fr_j\}  |} $$
+
+    \subsection{Résultats d'expériences}
+
+      \subsection{Valeur}
+
+      Est-ce que ça vaut le coup de donné les valeurs des fonctions objectif ?? (si oui je te ferai le tableau) Mais genre on dit quoi dessus mdr ?
+
+      \subsubsection{Temps d'execution}
+
+      Nous avons réunis dans les tableaux suivant les temps d'exécution sur les 4 cas différentes. Le tableau de gauche correspond aux temps d'execution lorsqu'on utilise le solveur choco, tant dis que le tableau de droite concerne le solveur ace. Il est important de préciser que nous avons limiter le temps d'exécuton à 10 minutes.
+
+      \begin{minipage}[t]{0.5\linewidth}
+        \footnotesize
+        \begin{tabular}{ |c|c|c|c|c| }
+          \hline
+          \textbf{Nom du fichier} & \textbf{CAS 1} & \textcolor[gray]{0.6}{\textbf{CAS 2}}   & \textbf{CAS 2 BIS} & \textbf{CAS 3} \\
+          \hline
+          \scriptsize{150\_13\_15\_5\_0.800000\_26} & \textcolor{red}{9,114s} & \textcolor[gray]{0.6}{ 10m0,003s} & 1,875s& \textcolor{green}{1,775s}\\
+          \hline
+          \scriptsize{150\_13\_15\_5\_0.800000\_28} & \textcolor{red}{8,746s} & \textcolor[gray]{0.6}{ 10m0,003s} & \textcolor{green}{1,768s} & 2,177s \\
+          \hline
+          \scriptsize{150\_13\_15\_5\_0.800000\_29} &\textcolor{red}{ 23,106s} & \textcolor[gray]{0.6}{ 10m0,003s} & \textcolor{green}{2,432s} & 9,770s \\
+          \hline
+          \scriptsize{150\_13\_15\_5\_0.800000\_2} & \textcolor{red}{9,103s} & \textcolor[gray]{0.6}{ 10m0,003s} & 3,863s & \textcolor{green}{4,869s} \\
+          \hline
+          \scriptsize{150\_13\_15\_5\_0.800000\_8} & 14,385s & \textcolor[gray]{0.6}{ 10m0,006s} & \textcolor{green}{8,735s} & \textcolor{red}{14,841s}\\
+          \hline
+          \scriptsize{250\_25\_15\_5\_0.820000\_20} & \textcolor{red}{20,851s} & \textcolor[gray]{0.6}{ 10m0,003s} & \textcolor{green}{12,317s} & 15,637s \\
+          \hline
+          \scriptsize{250\_25\_15\_5\_0.820000\_22} &\textcolor{red}{ 21,368s} & \textcolor[gray]{0.6}{ 10m0,014s} & \textcolor{green}{10,138s} & 15,675s \\
+          \hline
+          \scriptsize{250\_25\_15\_5\_0.820000\_5} & \textcolor{red}{24,417s} & \textcolor[gray]{0.6}{ 10m0,004s} & \textcolor{green}{13,985s} & 18,861s \\
+          \hline
+          \scriptsize{250\_25\_15\_5\_0.820000\_7} & \textcolor{red}{1m25,918s} & \textcolor[gray]{0.6}{ 10m0,009s} & \textcolor{green}{17,085s} & 23,151s \\
+          \hline
+          \scriptsize{250\_25\_15\_5\_0.820000\_9} & \textcolor{red}{30,516s} & \textcolor[gray]{0.6}{ 10m0,004s} & \textcolor{green}{12,427s} & 16,081s\\
+          \hline
+          \scriptsize{500\_30\_20\_5\_0.870000\_24} & \textcolor{red}{1m5,376s} & \textcolor[gray]{0.6}{ 10m0,008s} & \textcolor{green}{22,674s} & 32,296s \\
+          \hline
+          \scriptsize{500\_30\_20\_5\_0.870000\_29} & \textcolor{red}{1m48,111s} & \textcolor[gray]{0.6}{ 10m0,009s} & \textcolor{green}{23,076s} & 1m4,631s \\
+          \hline
+          \scriptsize{500\_30\_20\_5\_0.870000\_45} & \textcolor{red}{1m37,911s} & \textcolor[gray]{0.6}{ 10m0,008s} & \textcolor{green}{18,963s} & 44,055s \\
+          \hline
+          \scriptsize{500\_30\_20\_5\_0.870000\_48} & \textcolor[gray]{0.6}{10m0,016s} & \textcolor[gray]{0.6}{ 10m0,017s} & \textcolor{green}{21,797s} & \textcolor{red}{50,926s} \\
+          \hline
+          \scriptsize{50\_7\_10\_5\_0.800000\_0} &\textcolor{red}{ 15,259s} & \textcolor[gray]{0.6}{ 10m0,003s} & \textcolor{green}{7,826s} & 10,754s \\
+          \hline
+          \scriptsize{50\_7\_10\_5\_0.800000\_1} & 14,113s & \textcolor[gray]{0.6}{ 10m0,067s} & \textcolor{green}{8,736s} & \textcolor{red}{21,748s} \\
+          \hline
+          \scriptsize{50\_7\_10\_5\_0.800000\_6} & \textcolor{red}{12,067s} & \textcolor[gray]{0.6}{ 10m0,071s} & \textcolor{green}{6,799s} & 7,601s \\
+          \hline
+          \scriptsize{50\_7\_10\_5\_0.800000\_7} & \textcolor{red}{28,409s} & \textcolor[gray]{0.6}{ 10m0,006s} & \textcolor{green}{7,375s} & 8,325s \\
+          \hline
+          \scriptsize{50\_7\_10\_5\_0.800000\_8} & \textcolor{red}{13,511s} & \textcolor[gray]{0.6}{ 10m0,003s }& 8,190s & \textcolor{green}{7,660s} \\
+          \hline
+        \end{tabular}
+        ~\\
+        \centering
+        \textbf{\large Tableau des résultats avec le solveur Choco} % C'est le titre de la minipage
+      \end{minipage}
+      \hfill
+     \begin{minipage}[t]{0.6\linewidth}
+       \footnotesize
+         \begin{tabular}{ |c|c|c|c|c| }
+           \hline
+           \textbf{Nom du fichier} & \textbf{CAS 1} &\textcolor[gray]{0.6}{ \textbf{CAS 2}} & \textbf{CAS 2 BIS} & \textbf{CAS 3} \\
+           \hline
+           \scriptsize{150\_13\_15\_5\_0.800000\_26} & \textcolor{red}{9,148s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{1,934s} & 2,080s\\
+           \hline
+           \scriptsize{150\_13\_15\_5\_0.800000\_28} & \textbf{\textcolor{red}{7,527s}} & \textcolor[gray]{0.6}{10m0,003 }& \textcolor{green}{2,045s} & 2,819s \\
+           \hline
+           \scriptsize{150\_13\_15\_5\_0.800000\_29} & \textcolor{red}{38,114s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{3,033s} & \textbf{8,701s} \\
+           \hline
+           \scriptsize{150\_13\_15\_5\_0.800000\_2} & \textcolor{red}{11,311s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{6,704s} & 8,018s \\
+           \hline
+           \scriptsize{150\_13\_15\_5\_0.800000\_8} & \textcolor{red}{19,314s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{9,039s} & 16,969s \\
+           \hline
+           \scriptsize{250\_25\_15\_5\_0.820000\_20} & \textcolor{red}{22,871s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{12,827s} & 15,720s \\
+           \hline
+           \scriptsize{250\_25\_15\_5\_0.820000\_22} & \textbf{\textcolor{red}{20,711s}} & \textcolor[gray]{0.6}{10m0,040s} & \textcolor{green}{13,023s} & 17,823s \\
+           \hline
+           \scriptsize{250\_25\_15\_5\_0.820000\_5} & \textbf{\textcolor{red}{21,584s}} & \textcolor[gray]{0.6}{10m0,003 }& \textbf{\textcolor{green}{13,005s}} & \textbf{15,649s} \\
+           \hline
+           \scriptsize{250\_25\_15\_5\_0.820000\_7} & \textbf{\textcolor{red}{1m19,278s}}& \textcolor[gray]{0.6}{10m0,004s} &\textbf{ \textcolor{green}{11,586s}} & \textbf{21,511s} \\
+           \hline
+           \scriptsize{250\_25\_15\_5\_0.820000\_9} & \textbf{\textcolor{red}{29,120s}} & \textcolor[gray]{0.6}{10m0,017s} & \textcolor{green}{14,780s} & 20,984s \\
+           \hline
+           \scriptsize{500\_30\_20\_5\_0.870000\_24} & \textcolor{red}{1m17,392s} & \textcolor[gray]{0.6}{10m0,069s} & \textcolor{green}{23,233s} & 36,927s \\
+           \hline
+           \scriptsize{500\_30\_20\_5\_0.870000\_29} & \textcolor{red}{1m37,635s} & \textcolor[gray]{0.6}{10m0,008s} & \textcolor{green}{18,379s} & 49,842s \\
+           \hline
+           \scriptsize{500\_30\_20\_5\_0.870000\_45} & \textcolor{red}{1m42,731s} & \textcolor[gray]{0.6}{10m0,018s} & 1m2,116s & \textcolor{green}{51,214s} \\
+           \hline
+           \scriptsize{500\_30\_20\_5\_0.870000\_48} & \textcolor[gray]{0.6}{10m0,011s} & \textcolor[gray]{0.6}{10m0,009s} &  \textcolor{green}{22,408s} & \textbf{\textcolor{red}{43,302s}} \\
+           \hline
+           \scriptsize{50\_7\_10\_5\_0.800000\_0} &\textbf{ \textcolor{red}{12,524s}} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{8,766s} & \textbf{10,333s} \\
+           \hline
+           \scriptsize{50\_7\_10\_5\_0.800000\_1} & \textbf{13,005s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{8,972s} & \textbf{\textcolor{red}{19,113s}} \\
+           \hline
+           \scriptsize{50\_7\_10\_5\_0.800000\_6} & \textcolor{red}{37,418s} & \textcolor[gray]{0.6}{10m0,073s} & \textbf{\textcolor{green}{6,258s}} & \textbf{7,170s} \\
+           \hline
+           \scriptsize{50\_7\_10\_5\_0.800000\_7} & \textbf{\textcolor{red}{23,807s}} & \textcolor[gray]{0.6}{10m0,007s} & \textcolor{green}{8,416s} & \textbf{10,006s} \\
+           \hline
+           \scriptsize{50\_7\_10\_5\_0.800000\_8} & \textbf{\textcolor{red}{12,348s}} & \textcolor[gray]{0.6}{10m0,068s} & \textbf{7,770s} & \textcolor{green}{7,660s} \\
+           \hline
+         \end{tabular}
+       ~\\\\
+       \centering
+       \textbf{\large Tableau des résultats avec le solveur Ace} % C'est le titre de la minipage
+     \end{minipage}
+
+     Nous avons mis en gris les temps correspondant à des non-aboutissement, c'est-à-dire que le processus à été arrêté en cours d'exécution, au bout de 10 minutes.
+
+
+     Je te fais une liste des observations comme ça toi tu peux ré-organiser corresctement :
+     \begin{itemize}
+       \item On remarque que le \textit{CAS 2} n'a jamais abouti. Pour autant, le \textit{CAS 2 BIS} lui a toujours abouti. Cela peut signifie que la fonction objetif du \textit{CAS 2} n'est pas bien défini, ou alors trop complexe par rapport au problème.
+       \item Les valeurs dans le tableau de droite sont en gras lorsque le temps d'exécution est plus faible en utilisant le solveur Ace qu'en utilisant le solveur choco. On remarque que le solver choco est plus efficace en terme de temps.
+     \end{itemize}
+
+
 
   \section{Problèmes de satisfaction de contraintes valués}
 
-  \textbf{Les contraintes} $\forall i,j \in \{1,2,...,n \}$, et $\forall t \in \{1,2,...,k\}$
-  \begin{itemize}
-    \item L'écart entre les deux fréquences d'une même station doit être $\delta_{i}$ :
-     $| fe_{i} - fr_{i} | = \delta{i}$ -> \color{green} 0 \color{red} + $\infty$ \color{black}
-    \item L'écart minimum à garantir entre les fréquences des stations $i$ et $j$ (Dures pour toutes les stations qu'on veut en liaison et grosse molles pour le reste ) :
+  \subsection{Modélisation du problème}
+
+    Pour chaque instance du problème, nous disposons de diverses informations que nous regroupons par les notations suivantes.
+    On note $n$ le nombre de stations et $k$ le nombre de région de l'instance du problème. De plus, on note $L$ l'ensemble des couples de stations qui souhaite être en liaisons
+    Soit $i \in \{1,2,...,n \}$, on note :
     \begin{itemize}
-      \item $| fe_i - fe_j | \geq \Delta_{i,j}$
-      \item $| fe_i - fr_j | \geq \Delta_{i,j}$
-      \item $| fr_i - fe_j | \geq \Delta_{i,j}$
-      \item $| fr_i - fr_j | \geq \Delta_{i,j}$
+      \item Pour $ j \in \{1,2,...,n \}, i<j$, $\Delta_{i,j}$ qui correspond à l'écart minimum entre les fréquences des stations $i$ et $j$. Cette valeur est nulle par défault, et est non nulle si elle est renseignée dans les données.
+      \item $n_{i}$ le nombre maximum de fréquences différentes utilisées pour la région $i$
+      \item $\delta_{i}$ l'écart entre les deux fréquences de la sation $i$
+      \item $r_{i}$ le numéro de région de la station $i$
     \end{itemize}
-    \item Le nombre de fréquence différentes pour la région $t$ est au maximum $n_t$ : $nValues(\{fr_{i}, fe_{i} | \forall i \in \{1,2,...,n \}, r_{i} = t \}, \leq, n_{t})$ 0 pour inférieur à $n_t$ et après ensuite 1 à chaque nouvelle station (donner un maximum pour pas faire exploser le nombre de fréquence)
-    \item Si les stations $i$ et $j$ doivent pouvoir communiquer:
-    $fr_i = fe_j$ et $fe_i = fr_j$  \color{green} 0 \color{red} + $\infty$ \color{black}
-  \end{itemize}
 
-  Contraintes dures 2 pour toutes les stations devan être en liaisons.
-
-  \subsection{Cas 2 }
-
-    \textbf{Les contraintes} $\forall i,j \in \{1,2,...,n \}$, et $\forall t \in \{1,2,...,k\}$
+    Ainsi, nous pouvons définir l'instance $\mathcal{P} = (X, D, W, SV)$ avec :
     \begin{itemize}
-      \item L'écart entre les deux fréquences d'une même station doit être $\delta_{i}$ :
-       $| fe_{i} - fr_{i} | = \delta{i}$ -> \color{green} 0 \color{red} + $\infty$ \color{black}
-      \item L'écart minimum à garantir entre les fréquences des stations $i$ et $j$ :
-      \begin{itemize}
-        \item $| fe_i - fe_j | \geq \Delta_{i,j}$
-        \item $| fe_i - fr_j | \geq \Delta_{i,j}$
-        \item $| fr_i - fe_j | \geq \Delta_{i,j}$
-        \item $| fr_i - fr_j | \geq \Delta_{i,j}$
-      \end{itemize}
-      \item Le nombre de fréquence différentes pour la région $t$ est au maximum $n_t$ : $nValues(\{fr_{i}, fe_{i} | \forall i \in \{1,2,...,n \}, r_{i} = t \}, \leq, n_{t})$
-      \item Si les stations $i$ et $j$ doivent pouvoir communiquer:
-      $fr_i = fe_j$ et $fe_i = fr_j$
-      \item On veut maximiser le nombre de liaison :  $\displaystyle{ \max_{n} nValues(\{ (i,j) | i<j, fe_i = fr_j fe_j = fr_i \}, =,n)}$ -->
-  \end{itemize}
+      \item $X = \{ fe_i, fr_i | \forall i \in \{1,2,...,n\}$ tel que $\forall i \in \{1,2,...,n\}$:
+            \begin{itemize}
+              \item $fe_{i}$ correspond à la fréquence pour l'émetteur de la station $i$.
+              \item $fr_{i}$ correspond à la fréquence pour le recepteur de la station $i$.
+            \end{itemize}
+      \item $D = \{d_{fe_i}, d_{fr_i} | \forall i \in \{1,2,...,n\} \}$ où, $\forall i \in \{1,2,...,n\}$
+            \begin{itemize}
+              \item $d_{fe_i}$ correspond à l'ensemble des valeurs de fréquences possibles pour la fréquence émetrice de la station $i$. Cet ensemble de valeur se retrouve dans le fichier de données.
+              \item $d_{fr_i}$ correspond à l'ensemble des valeurs de fréquences possibles pour la fréquence receptrice de la station $i$. Cet ensemble de valeur se retrouve dans le fichier de données.
+            \end{itemize}
+      \item $W$ :
+            \begin{itemize}
+              \item L'écart entre les deux fréquences d'une même station doit être $\delta_{i}$ pour toute sation $i$ :
+               $| fe_{i} - fr_{i} | = \delta{i}$ $\rightarrow$ \color{green} 0 \color{red} + $\infty$ \color{black}
+
+               \item L'écart minimum à garantir entre les fréquences des stations $i$ et $j$. Pour cette contrainte, on a différentier le cas où les stations $i$ et $j$ sont en liaisons et le cas où elles ne le sont pas :
+               \begin{itemize}
+                 \item Si $i$ et $j$ sont en liaisons (on est face à des contraintes dures) :
+                       \begin{itemize}
+                         \item $| fe_i - fe_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{+\infty}$
+                         \item $| fe_i - fr_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{+\infty}$
+                         \item $| fr_i - fe_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{+\infty}$
+                         \item $| fr_i - fr_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{+\infty}$
+                       \end{itemize}
+                  \item Si les stations $i$ et $j$ ne sont pas forcément en liaisons, on passe sur des contraintes douces car on estime que les interferences on moins d'impacte puisque les stations ne rentrent pas en communication. Le poids d'une contrainte violé est $\Delta_{i,j}$ car on souhaite que plus l'écart demandé est grand, plus la contrante doit être satisfaite.
+                        \begin{itemize}
+                          \item $| fe_i - fe_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{\Delta_{i,j}}$
+                          \item $| fe_i - fr_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{\Delta_{i,j}}$
+                          \item $| fr_i - fe_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{\Delta_{i,j}}$
+                          \item $| fr_i - fr_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{\Delta_{i,j}}$
+                        \end{itemize}
+               \end{itemize}
+
+               \item Si les stations $i$ et $j$ doivent pouvoir communiquer, on impose que la fréquence receptrice de l'une soit la fréquence emetrice de l'une, et inversement. On est donc face à une contrainte dure :
+               $fr_i = fe_j$ et $fe_i = fr_j$ $\rightarrow$ \textcolor{green}{0}, \textcolor{red}{+$\infty$}
+            \end{itemize}
+        \item $SV = (\mathbb{N} \cup \{ + \infty \}, \leq, +, 0, +\infty)$
+    \end{itemize}
+
+
 
   \section{Consignes}
 
-  Quelques expériences avec 2 ou 3 solveurs --> faire un retour d'expérience,
-  Avec Toulbar faire avec différents réglages pour voir des comportement différents
-  Analyser les résultats --> étude de cas dans la globalité : voir les différences entre les solveur etc Voir que le critère a une incidence sur le temps de calcul etc, faire un conclusion sur qui est le meilleur tout ça
+    Quelques expériences avec 2 ou 3 solveurs --> faire un retour d'expérience,
+    Avec Toulbar faire avec différents réglages pour voir des comportement différents
+    Analyser les résultats --> étude de cas dans la globalité : voir les différences entre les solveur etc Voir que le critère a une incidence sur le temps de calcul etc, faire un conclusion sur qui est le meilleur tout ça
 
-  Sur la partie expérimentale : le temps est important ! Limité le temps à 10 minutes
+    Sur la partie expérimentale : le temps est important ! Limité le temps à 10 minutes
 
-  Rapport + achives avec sources mettre un seul fichier XML par types de trucs (pour pas que ce soir trop lourd)
+    Rapport + achives avec sources mettre un seul fichier XML par types de trucs (pour pas que ce soir trop lourd)
 
 \end{document}
