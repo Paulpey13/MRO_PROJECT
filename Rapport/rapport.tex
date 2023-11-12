@@ -130,7 +130,7 @@
 
       Nous avons choisi d'utiliser le langage python, en utilisant la bibliothèque PyCSP3 permettant la modélisation et la résolution des COP. Concernant la résolution, nous avons décidé d'utiliser deux solveurs différents. Le premier étant le solveur choco, le deuxième étant le solveur ace. Ce sont deux solveurs disponibles dans la bibliothèque PyCSP3. Pour des questions pratiques, nous avons limité les temps d'exécution à 10 minutes par instance et par solveur.
 
-      \subsubsection{Valeur}
+      \subsubsection{Valeurs des expérimentations}
 
         Nous avons réuni les valeurs des fonctions objectifs dans le tableau qui suit, en fonction des cas. Ces valeurs sont identiques quel que soit le solveur utilisé puisque nous utilisons des solutions complètes qui ne dépendent uniquement des données, et non de la méthode de résolution. \\
         Le tableau est découpé en quatres paquets de lignes. Le premier paquet de lignes correspond à des intances avec 150 stations et 15 régions. Le deuxième à des instances avec 250 stations et 25 régions. Le troisième à des instances avec 500 stations et 30 régions. Et pour finir, le dernier paquet correspond à des instances avec 50 stations et 7 régions. \\
@@ -307,63 +307,119 @@
        \end{itemize}
 
 
-
   \section{Problèmes de satisfaction de contraintes valués}
 
-  \subsection{Modélisation du problème}
+    \subsection{Modélisation du problème}
 
-    Pour chaque instance du problème, nous disposons de diverses informations que nous regroupons par les notations suivantes.
-    On note $n$ le nombre de stations et $k$ le nombre de régions de l'instance du problème. De plus, on note $L$ l'ensemble des couples de stations qui souhaitent être en liaison.
-    Soit $i \in \{1,2,...,n \}$, on note :
-    \begin{itemize}
-      \item Pour $ j \in \{1,2,...,n \}, i<j$, $\Delta_{i,j}$ qui correspond à l'écart minimum entre les fréquences des stations $i$ et $j$. Cette valeur est nulle par défaut, et est non nulle si elle est renseignée dans les données.
-      \item $n_{i}$ le nombre maximum de fréquences différentes utilisées pour la région $i$
-      \item $\delta_{i}$ l'écart entre les deux fréquences de la sation $i$
-      \item $r_{i}$ le numéro de région de la station $i$
-    \end{itemize}
+      Pour chaque instance du problème, nous disposons de diverses informations que nous regroupons par les notations suivantes.
+      On note $n$ le nombre de stations et $k$ le nombre de régions de l'instance du problème. De plus, on note $L$ l'ensemble des couples de stations qui souhaitent être en liaison.
+      Soit $i \in \{1,2,...,n \}$, on note :
+      \begin{itemize}
+        \item Pour $ j \in \{1,2,...,n \}, i<j$, $\Delta_{i,j}$ qui correspond à l'écart minimum entre les fréquences des stations $i$ et $j$. Cette valeur est nulle par défaut, et est non nulle si elle est renseignée dans les données.
+        \item $n_{i}$ le nombre maximum de fréquences différentes utilisées pour la région $i$
+        \item $\delta_{i}$ l'écart entre les deux fréquences de la sation $i$
+        \item $r_{i}$ le numéro de région de la station $i$
+      \end{itemize}
 
-    Ainsi, nous pouvons définir l'instance $\mathcal{P} = (X, D, W, SV)$ avec :
-    \begin{itemize}
-      \item $X = \{ fe_i, fr_i | \forall i \in \{1,2,...,n\}$ tel que $\forall i \in \{1,2,...,n\}$:
-            \begin{itemize}
-              \item $fe_{i}$ correspond à la fréquence pour l'émetteur de la station $i$.
-              \item $fr_{i}$ correspond à la fréquence pour le récepteur de la station $i$.
-            \end{itemize}
-      \item $D = \{d_{fe_i}, d_{fr_i} | \forall i \in \{1,2,...,n\} \}$ où, $\forall i \in \{1,2,...,n\}$
-            \begin{itemize}
-              \item $d_{fe_i}$ correspond à l'ensemble des valeurs de fréquences possible pour la fréquence émetrice de la station $i$. Cet ensemble de valeur se retrouve dans le fichier de données.
-              \item $d_{fr_i}$ correspond à l'ensemble des valeurs de fréquences possible pour la fréquence réceptrice de la station $i$. Cet ensemble de valeurs se retrouve dans le fichier de données.
-            \end{itemize}
-      \item $W$ :
-            \begin{itemize}
-              \item L'écart entre les deux fréquences d'une même station doit être $\delta_{i}$ pour toute sation $i$ :
-               $| fe_{i} - fr_{i} | = \delta{i}$ $\rightarrow$ \color{green} 0 \color{red} + $\infty$ \color{black}
+      Ainsi, nous pouvons définir l'instance $\mathcal{P} = (X, D, W, SV)$ avec :
+      \begin{itemize}
+        \item $X = \{ fe_i, fr_i | \forall i \in \{1,2,...,n\}$ tel que $\forall i \in \{1,2,...,n\}$:
+              \begin{itemize}
+                \item $fe_{i}$ correspond à la fréquence pour l'émetteur de la station $i$.
+                \item $fr_{i}$ correspond à la fréquence pour le récepteur de la station $i$.
+              \end{itemize}
+        \item $D = \{d_{fe_i}, d_{fr_i} | \forall i \in \{1,2,...,n\} \}$ où, $\forall i \in \{1,2,...,n\}$
+              \begin{itemize}
+                \item $d_{fe_i}$ correspond à l'ensemble des valeurs de fréquences possible pour la fréquence émetrice de la station $i$. Cet ensemble de valeur se retrouve dans le fichier de données.
+                \item $d_{fr_i}$ correspond à l'ensemble des valeurs de fréquences possible pour la fréquence réceptrice de la station $i$. Cet ensemble de valeurs se retrouve dans le fichier de données.
+              \end{itemize}
+        \item $W$ :
+              \begin{itemize}
+                \item L'écart entre les deux fréquences d'une même station doit être $\delta_{i}$ pour toute sation $i$. Cette contrainte est matérielle, on la met donc en contrainte dure. Ainsi, on la définie par :
+                 $| fe_{i} - fr_{i} | = \delta{i}$ $\rightarrow$ \color{green} 0 \color{red} + $\infty$ \color{black}
 
-               \item L'écart minimum à garantir entre les fréquences des stations $i$ et $j$. Pour cette contrainte, on a différencié le cas où les stations $i$ et $j$ sont en liaisons et le cas où elles ne le sont pas :
-               \begin{itemize}
-                 \item Si $i$ et $j$ sont en liaisons (on est face à des contraintes dures) :
-                       \begin{itemize}
-                         \item $| fe_i - fe_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{+\infty}$
-                         \item $| fe_i - fr_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{+\infty}$
-                         \item $| fr_i - fe_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{+\infty}$
-                         \item $| fr_i - fr_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{+\infty}$
-                       \end{itemize}
-                  \item Si les stations $i$ et $j$ ne sont pas forcément en liaison, on passe sur des contraintes douces car on estime que les interferences ont moins d'impacte puisque les stations ne rentrent pas en communication. Le poids d'une contrainte violée est $\Delta_{i,j}$ car on souhaite que plus l'écart demandé est grand, plus la contrante doit être satisfaite.
-                        \begin{itemize}
+                 \item L'écart minimum à garantir entre les fréquences des stations $i$ et $j$. Pour cette contrainte, on a décidé de la catégoriser entant que contraintes douce. La raison est que l'on estime que les interferences ont un impacte moindre puisque les stations ne rentrent pas forcément en communication. Le poids d'une contrainte violée est $\Delta_{i,j}$ car on souhaite que plus l'écart demandé est grand, plus la contrante doit être satisfaite.
+                      \begin{itemize}
                           \item $| fe_i - fe_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{\Delta_{i,j}}$
                           \item $| fe_i - fr_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{\Delta_{i,j}}$
                           \item $| fr_i - fe_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{\Delta_{i,j}}$
                           \item $| fr_i - fr_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{\Delta_{i,j}}$
-                        \end{itemize}
-               \end{itemize}
-
-               \item Si les stations $i$ et $j$ doivent pouvoir communiquer, on impose que la fréquence réceptrice de l'une soit la fréquence émetrice de l'autre, et inversement. On est donc face à une contrainte dure :
-               $fr_i = fe_j$ et $fe_i = fr_j$ $\rightarrow$ \textcolor{green}{0}, \textcolor{red}{+$\infty$}
-            \end{itemize}
-        \item $SV = (\mathbb{N} \cup \{ + \infty \}, \leq, +, 0, +\infty)$
-    \end{itemize}
+                      \end{itemize}
 
 
+                 \item Pour que les stations $i$ et $j$ puisses communiquer, on doit avoir que la fréquence réceptrice de l'une soit la fréquence émetrice de l'autre, et inversement. Cependant, nous passons cette contrante en contrainte douce puisqu'avoir toutes les stations concernées en communications implique que le problème n'a pas de solution. L'objectif est donc d'avoir tout de même certaines liaisons possibles. On écrit donc la contrainte :
+                 $$( fr_i = fe_j~et~fe_i = fr_j )\rightarrow \textcolor{green}{0}, \textcolor{red}{max_{Delta}}$$ où $max_{Delta} = \max_{i,j} Delta_{i,j}$ Nous avons décidé de prendre le même poids pour chaque contrainte de liaisons car nous n'avons pas d'informations sur quelles pourraient être les liaisons les plus importantes, nous mettons donc toutes les liaisons au même niveau. De plus, nous avons trouver cela logique de prendre la valeur maximale des poids des contraintes douces qui concernent les interférences puisque les liaisons sont des contraintes plus importantes à nos yeux. De plus, si nous n'établissons pas de liaisons entre les stations, gérer les interférences n'est plus aussi important.
+              \end{itemize}
+          \item $SV = (\mathbb{N} \cup \{ + \infty \}, \leq, +, 0, +\infty)$
+      \end{itemize}
+
+    \subsection{Résultats d'expériences}
+      Pour ces expériences, nous avons utilisées un ordinateur avec la configuration matériel suivante :
+      \begin{itemize}
+        \item CPU : 16 GB
+        \item Taille de la RAM (mémoire) : i5-12450H  (jusqu'à 4.4GHz)
+      \end{itemize}
+
+      Nous avons décidé d'implémenter un programme en langage Python afin qu'à partir d'une fichier de donnée type JSON, nous en déduisons le fichier au format WCSP correspondant. Ainsi, nous donnons le fichier WCSP au solveur Toulbar2 utilisé pour résoudre les différentes instances. Pour des questions pratiques, nous avons limité le temps d'exécution à 10 minutes via l'option proposé par le solveur. De plus, nous avons uniquement utilisées ce solveur, cependant nous avons décidé de regarder différentes options qu'il propose. Nous avons donc établit 4 types de test :
+      \begin{itemize}
+        \item \textbf{TEST 1}. Pour ce test, nous avons ni activé, ni modifie les options du solveur. Ce test nous permet d'avoir une base de comparaisons pour les autres.
+        \item \textbf{TEST 2}. Pour ce test, nous avons décidé de limiter le nombre de \textit{backtack} (\textbf{-bt}) à $10000$. Par défault, cette valeur est $9223372036854775807$, celà équivaut à dire qu'il n'existe pas réellement de limite de \textit{backtracking}. Limiter cette valeur peut permettre de forcer le solveur à changer de stratégie de résolution. En effet, par défault il optera pour une stratégie de \textit{backtracking} chronologique, c'est-à-dire qu'il revient à la dernière décision non explorée dans l'ordre chronologique dans lequel les décisions ont été prises. En limitant cette valeur, il peut arriver qu'il ne puisse pas utiliser cette stratégie.
+        \item \textbf{TEST 3}. Pour ce troisième test, on a uniquement modifié l'option \textbf{-p}. Cette option permet d'activer un prétraitement des WCSP. En effet, par défault la valeur est à $-1$ ce qui implique qu'il n'y a pas ce prétraitement. Nous avons fixé sa valeur à $3$. Cette option indique que le solveur va se concenter sur la simplification et la réduction du problème mais ne cherchera pas à trouver une solution complète. L'option activé implique une élimination des variables de degrès inferieur à la valeur de \textit{p}. Ainsi, dans notre cas, nous avons décidé que toutes les variables de degrès inférieur ou égal à $3$ seraient supprimé du problème. Pour rappel, le degrè d'une variable correspond au nombre de contrainte dans lesquels la variable apparait.
+        \item \textbf{TEST 4}. Pour ce dernier type de test, nous avons décidé de modifier l'option \textbf{-e} qui par défault vaut $3$. Cette option implique que la recherche par \textit{boosting} avec élimination de variable de degré inférieur ou égale à la valeur de \textit{e}. Nous avons décidé de mettre cette valeur à $2$ pour voir si celà changeait quelque chose lors de la résolution. Cette option concerne l'utilisation de l'élimination de variables pour accélerer la recherche dans la résolution de WCSP. Le solveur va retirées certaines variables du problème pour réduire sa complexité. Nous avons choisi une valeur inférieur à la valeur par défault pour voir la différence notament en terme de temps de calcul qui devrait être plus élevé dans ce cas là, car on obtient un problème plus complexe car moins réduit. A la différence du \textbf{TEST 3}, cette élimination n'est pas fait en prétraitement.
+      \end{itemize}
+
+      \subsubsection{Valeurs des résultats}
+
+      \subsubsection{Temps d'exécution}
+      \begin{table}[ht]
+        \centering
+        \begin{tabular}{| c | c | c| c| c |}
+          \hline
+          \textbf{Nom du fichier} & \textbf{TEST 1} & \textbf{TEST 2} & \textbf{TEST 3} & \textbf{TEST 4} \\
+          \hline
+          celar\_50\_7\_10\_5\_0.800000\_0 &  &  &  &  \\
+          \hline
+          celar\_50\_7\_10\_5\_0.800000\_1 &  &  &  &  \\
+          \hline
+          celar\_50\_7\_10\_5\_0.800000\_4 &  &  &  &  \\
+          \hline
+          celar\_50\_7\_10\_5\_0.800000\_9 &  &  &  &  \\
+          \hline
+          celar\_50\_8\_10\_5\_0.800000\_8 &  &  &  &  \\
+          \hline
+          celar\_150\_13\_15\_5\_0.800000\_2 &  &  &  &  \\
+          \hline
+          celar\_150\_13\_15\_5\_0.800000\_9 &  &  &  &  \\
+          \hline
+          celar\_150\_13\_15\_5\_0.800000\_18 &  &  &  &  \\
+          \hline
+          celar\_150\_13\_15\_5\_0.800000\_20 &  &  &  &  \\
+          \hline
+          celar\_150\_13\_15\_5\_0.800000\_25 &  &  &  &  \\
+          \hline
+          celar\_250\_25\_15\_5\_0.820000\_0 &  &  &  &  \\
+          \hline
+          celar\_250\_25\_15\_5\_0.820000\_6 &  &  &  &  \\
+          \hline
+          celar\_250\_25\_15\_5\_0.820000\_8 &  &  &  &  \\
+          \hline
+          celar\_250\_25\_15\_5\_0.820000\_17 &  &  &  &  \\
+          \hline
+          celar\_250\_25\_15\_5\_0.820000\_29 &  &  &  &  \\
+          \hline
+          celar\_500\_30\_20\_5\_0.870000\_0 &  &  &  &  \\
+          \hline
+          celar\_500\_30\_20\_5\_0.870000\_8 &  &  &  &  \\
+          \hline
+          celar\_500\_30\_20\_5\_0.870000\_25 &  &  &  &  \\
+          \hline
+          celar\_500\_30\_20\_5\_0.870000\_30 &  &  &  &  \\
+          \hline
+          celar\_500\_30\_20\_5\_0.870000\_49 &  &  &  &  \\
+          \hline
+        \end{tabular}
+        \caption{Temps d'executions de Toulbar2 pour chaque instances}
+      \end{table}
 
   \section{Consignes}
 
