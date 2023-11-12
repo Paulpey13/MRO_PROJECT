@@ -23,7 +23,7 @@
 \definecolor{orange}{rgb}{0.99,0.69,0.07}
 
   \title{Modélisation et résolution pour l'optimisation \\ Rapport \\[1ex] \large }
-  \author{Par Manon Girard \& Paul Peyssard \& Victor Tancrez}
+  \author{Par Manon Girard, Paul Peyssard \& Victor Tancrez}
   \date{}
   \maketitle
 
@@ -46,12 +46,12 @@
     \subsection{Modélisation du problème}
 
       Pour chaque instance du problème, nous disposons de diverses informations que nous regroupons par les notations suivantes.
-      On note $n$ le nombre de stations et $k$ le nombre de région de l'instance du problème. De plus, on note $L$ l'ensemble des couples de stations qui souhaite être en liaisons
+      On note $n$ le nombre de stations et $k$ le nombre de régions de l'instance du problème. De plus, on note $L$ l'ensemble des couples de stations qui souhaitent être en liaisons
       Soit $i \in \{1,2,...,n \}$, on note :
       \begin{itemize}
-        \item Pour $ j \in \{1,2,...,n \}, i<j$, $\Delta_{i,j}$ qui correspond à l'écart minimum entre les fréquences des stations $i$ et $j$. Cette valeur est nulle par défault, et est non nulle si elle est renseignée dans les données.
+        \item Pour $ j \in \{1,2,...,n \}, i<j$, $\Delta_{i,j}$ qui correspond à l'écart minimum entre les fréquences des stations $i$ et $j$. Cette valeur est nulle par défaut, et est non nulle lorsqu'elle est renseignée dans les données.
         \item $n_{i}$ le nombre maximum de fréquences différentes utilisées pour la région $i$
-        \item $\delta_{i}$ l'écart entre les deux fréquences de la sation $i$
+        \item $\delta_{i}$ l'écart entre les deux fréquences de la station $i$
         \item $r_{i}$ le numéro de région de la station $i$
       \end{itemize}
 
@@ -60,12 +60,12 @@
         \item $X = \{ fe_i, fr_i | \forall i \in \{1,2,...,n\}$ tel que $\forall i \in \{1,2,...,n\}$:
               \begin{itemize}
                 \item $fe_{i}$ correspond à la fréquence pour l'émetteur de la station $i$.
-                \item $fr_{i}$ correspond à la fréquence pour le recepteur de la station $i$.
+                \item $fr_{i}$ correspond à la fréquence pour le récepteur de la station $i$.
               \end{itemize}
         \item $D = \{d_{fe_i}, d_{fr_i} | \forall i \in \{1,2,...,n\} \}$ où, $\forall i \in \{1,2,...,n\}$
               \begin{itemize}
                 \item $d_{fe_i}$ correspond à l'ensemble des valeurs de fréquences possibles pour la fréquence émetrice de la station $i$. Cet ensemble de valeur se retrouve dans le fichier de données.
-                \item $d_{fr_i}$ correspond à l'ensemble des valeurs de fréquences possibles pour la fréquence receptrice de la station $i$. Cet ensemble de valeur se retrouve dans le fichier de données.
+                \item $d_{fr_i}$ correspond à l'ensemble des valeurs de fréquences possibles pour la fréquence réceptrice de la station $i$. Cet ensemble de valeurs se retrouve dans le fichier de données.
               \end{itemize}
         \item $C = C_1 \cup C_2 \cup C_3 \cup C_4 $ où :
               \begin{itemize}
@@ -80,43 +80,44 @@
                         \item $C_{2D,i,j} := \{(d_{fe_i},d_{fe_j},d_{fr_i},d_{fr_j}) ~tels~que~ | d_{fr_i} - d_{fr_j} | \geq \Delta_{i,j} \}$
                       \end{itemize}
                       Ainsi, $\displaystyle{C_2 = \bigcup_{i=1}^{n} C_{2A,i,j} \cup C_{2B,i,j} \cup C_{2C,i,j}  \cup C_{2D,i,j}}$
-                \item $C_3$ modèlise que le nombre de fréquence différentes pour la région $t$ est au maximum $n_t$. \\
+                \item $C_3$ modélise que le nombre de fréquences différentes pour la région $t$ est au maximum $n_t$. \\
                       On note, $C_{3,t} = nValues(\{fr_{i}, fe_{i} | \forall i \in \{1,2,...,n \}, r_{i} = t \}, \leq, n_{t})$. \\
                       Ainsi, $\displaystyle{C_3 = \bigcup_{t=1}^{k} C_{3,t}}$
-                \item $C_4$ modélise que si les stations $i$ et $j$ doivent pouvoir communiquer, alors la fréquence émétrice de l'une correspond à la fréquence receptice de l'autre, et inversement. \\
+                \item $C_4$ modélise que si les stations $i$ et $j$ doivent pouvoir communiquer, alors la fréquence émétrice de l'une correspond à la fréquence réceptice de l'autre, et inversement. \\
                 On note, $\displaystyle{ C_{4,r} := \{ (d_{fe_i},d_{fe_j},d_{fr_i},d_{fr_j})~tels~que~d_{fr_i} = d_{fe_j}~et~d_{fe_i} = d_{fr_j} \} }$ \\
                 Ainsi, $\displaystyle{C_4 = \bigcup_{r=1}^{|L|} C_{4,r}}$
 
               \end{itemize}
 
-          \item $f$ est la fonction objectif va dépendre du cas dans lequel on se trouve. Nous allons donner sa définition dans chaque cas dans les sous-parties suivantes.
+          \item $f$ est la fonction objectif qui va dépendre du cas dans lequel on se trouve. Nous allons donner sa définition dans chaque cas dans les sous-parties suivantes.
       \end{itemize}
 
 
 
-      \subsubsection{Cas 1 : Minimisation du nombre de fréquence utilisées}
+      \subsubsection{Cas 1 : Minimisation du nombre de fréquences utilisées}
 
-        Dans le premier cas, nous souhaitons minimiser le nombre de fréquence utilisées. Pour ce faire, nous avons choisit de définir la fonction objectif comme suit :
+        Dans le premier cas, nous souhaitons minimiser le nombre de fréquences utilisées. Pour ce faire, nous avons choisi de définir la fonction objectif comme suit :
         $$ \displaystyle{ \min_{n \in \mathbb{N}}  nValue(\{ e_{i}, r_{i} | \forall i \in \{1,2,...,n \}, =, m) }$$
 
-        Intuitivement, la contrainte globale $nValue$ permet de fixer le nombre de valeur de fréquence différente, émétrice et receptrice mélangées, à $m$. Ainsi, on souhaite minimiser la valeur de $m$, ce qui correspond à notre problème.
+        Intuitivement, la contrainte globale $nValue$ permet de fixer le nombre de valeurs de fréquences différentes, émétrice et réceptrice mélangées, à $m$. Ainsi, on souhaite minimiser la valeur de $m$, ce qui correspond à notre problème.
 
       \subsubsection{Cas 2 : Utilisation des fréquences les plus basses}
 
-        Dans ce deuxième cas, l'objectif est d'utilisées les valeurs de fréquences les plus basses possibles. Pour ce cas, nous avons eu deux point de vue différent. Ainsi, nous avons définit deux fonctions objectifs différentes. Les voici :
+        Dans ce deuxième cas, l'objectif est d'utiliser les valeurs de fréquences les plus basses possibles. Pour ce cas, nous avons eu deux points de vue différent. Ainsi, nous avons défini deux fonctions objectif différentes. Les voici :
         \begin{itemize}
-          \item On parlera ici du $CAS 2$. On définit la fonction objectif suivant :
+          \item On parlera ici du $CAS 2$. On défini la fonction objectif suivante :
                 $$ \displaystyle{\min_{n \in \mathbb{N}} \sum_{i=1}^{n} fe_i + fr_i } $$
 
-                Intuitivement, (là je sais pas quoi dire, c'était pas mon idée cette fonction farfelues, donc si toi t'as une idée de justification... :') )
-           \item On parlera dans ce cas du $CAS 2BIS$. On définit la fonction objetif par :
+                Intuitivement, cette fonction cherche à minimiser la somme totale des fréquences, en encourageant l'utilisation des fréquences les plus basses pour chaque station.
+
+           \item On parlera dans ce cas du $CAS 2BIS$. On défini la fonction objectif par :
                  $$ \displaystyle{\min \{ \max \{ \max_{i} fe_i , \max_{i} fr_i \} \}} $$
-                 Intuitivement, on prend la plus grande valeur des fréquences émétrice, de même pour les fréquences receptrice, et on prends la plus grande des deux, et on tente de la rendre la plus petite possibles. Ainsi, on prend la valeur de fréquence la plus grande qu'on tente de minimiser, ce qui va forcer tous les autres à être les plus petites possibles aussi.
+                 Intuitivement, on prend la plus grande valeur des fréquences émétrice, de même pour les fréquences réceptrice, on prend la plus grande des deux et on tente de la rendre la plus petite possible. Ainsi, on prend la valeur de fréquence la plus grande et on tente de la minimiser, ce qui va forcer toutes les autres à être minimisées.
         \end{itemize}
 
-      \subsubsection{Cas 3 : Minimiser la largeur de la bande de fréquence utilisées}
+      \subsubsection{Cas 3 : Minimiser la largeur de la bande de fréquences utilisées}
 
-        Dans ce troisième et dernier cas, on souhaite minimiser la largeur de la bande de fréquence utilisées, c'est-à-dire l'écart entre la plus basse et la plus haute des fréquences. Intuitivement celà se traduit par la fonction objectif suivante :
+        Dans ce troisième et dernier cas, on souhaite minimiser la largeur de la bande de fréquences utilisées, c'est-à-dire, l'écart entre la plus basse et la plus haute fréquence. Intuitivement cela se traduit par la fonction objectif suivante :
         $$ \displaystyle{ \min_{} | \max_{} \{\max_{j} fe_j, \max_{j} fr_j\}  - \min_{} \{\min_{j} fe_j, \min_{j} fr_j\}  |} $$
 
     \subsection{Résultats d'expériences}
@@ -125,9 +126,11 @@
 
       Est-ce que ça vaut le coup de donné les valeurs des fonctions objectif ?? (si oui je te ferai le tableau) Mais genre on dit quoi dessus mdr ?
 
+      En vrai ça peut rajouter quelque chose en plus mais pas obligé. Peut être pour montrer dans chaque cas un compromis temps d'execution/valeur de fonction objectif et faire une petite phrase dessus
+
       \subsubsection{Temps d'execution}
 
-      Nous avons réunis dans les tableaux suivant les temps d'exécution sur les 4 cas différentes. Le tableau de gauche correspond aux temps d'execution lorsqu'on utilise le solveur choco, tant dis que le tableau de droite concerne le solveur ace. Il est important de préciser que nous avons limiter le temps d'exécuton à 10 minutes.
+      Nous avons réuni dans les tableaux suivant les temps d'exécution pour les 4 cas différentes. Le tableau de gauche correspond aux temps d'execution lorsqu'on utilise le solveur choco, tandis que le tableau de droite correspond au solveur ace. Il est important de préciser que nous avons limité le temps d'exécuton à 10 minutes.
 
       \begin{minipage}[t]{0.5\linewidth}
         \footnotesize
@@ -229,13 +232,12 @@
        \textbf{\large Tableau des résultats avec le solveur Ace} % C'est le titre de la minipage
      \end{minipage}
 
-     Nous avons mis en gris les temps correspondant à des non-aboutissement, c'est-à-dire que le processus à été arrêté en cours d'exécution, au bout de 10 minutes.
+     Nous avons mis en gris les temps correspondant à des non-aboutissements, c'est-à-dire que le processus a été arrêté en cours d'exécution, au bout de 10 minutes.
 
-
-     Je te fais une liste des observations comme ça toi tu peux ré-organiser corresctement :
      \begin{itemize}
-       \item On remarque que le \textit{CAS 2} n'a jamais abouti. Pour autant, le \textit{CAS 2 BIS} lui a toujours abouti. Cela peut signifie que la fonction objetif du \textit{CAS 2} n'est pas bien défini, ou alors trop complexe par rapport au problème.
-       \item Les valeurs dans le tableau de droite sont en gras lorsque le temps d'exécution est plus faible en utilisant le solveur Ace qu'en utilisant le solveur choco. On remarque que le solver choco est plus efficace en terme de temps.
+       \item Concernant le \textit{CAS 2}, nous observons une absence totale de résultats aboutis. Cette situation contraste fortement avec le \textit{CAS 2 BIS}, qui a systématiquement abouti à des résultats. Cette différence pourrait suggérer que la fonction objectif définie dans le \textit{CAS 2} est soit mal adaptée, soit trop complexe pour être traitée efficacement par le solveur utilisé. Cette distinction entre les deux cas souligne l'importance d'une formulation adéquate de la fonction objectif dans la résolution de problèmes de programmation sous contrainte.
+       \item Généralement, on remarque que le solveur Choco est plus efficace en terme de temps que le solveur Ace. Les valeurs dans le tableau de droite sont en gras lorsque le temps d'exécution est plus faible en utilisant le solveur Ace qu'en utilisant le solveur choco.
+       \item On peut voir que dans la plus part des instances, le \textit{CAS 2 BIS} à le plus faible temps d'exécution.
      \end{itemize}
 
 
@@ -245,10 +247,10 @@
   \subsection{Modélisation du problème}
 
     Pour chaque instance du problème, nous disposons de diverses informations que nous regroupons par les notations suivantes.
-    On note $n$ le nombre de stations et $k$ le nombre de région de l'instance du problème. De plus, on note $L$ l'ensemble des couples de stations qui souhaite être en liaisons
+    On note $n$ le nombre de stations et $k$ le nombre de régions de l'instance du problème. De plus, on note $L$ l'ensemble des couples de stations qui souhaitent être en liaison.
     Soit $i \in \{1,2,...,n \}$, on note :
     \begin{itemize}
-      \item Pour $ j \in \{1,2,...,n \}, i<j$, $\Delta_{i,j}$ qui correspond à l'écart minimum entre les fréquences des stations $i$ et $j$. Cette valeur est nulle par défault, et est non nulle si elle est renseignée dans les données.
+      \item Pour $ j \in \{1,2,...,n \}, i<j$, $\Delta_{i,j}$ qui correspond à l'écart minimum entre les fréquences des stations $i$ et $j$. Cette valeur est nulle par défaut, et est non nulle si elle est renseignée dans les données.
       \item $n_{i}$ le nombre maximum de fréquences différentes utilisées pour la région $i$
       \item $\delta_{i}$ l'écart entre les deux fréquences de la sation $i$
       \item $r_{i}$ le numéro de région de la station $i$
@@ -259,19 +261,19 @@
       \item $X = \{ fe_i, fr_i | \forall i \in \{1,2,...,n\}$ tel que $\forall i \in \{1,2,...,n\}$:
             \begin{itemize}
               \item $fe_{i}$ correspond à la fréquence pour l'émetteur de la station $i$.
-              \item $fr_{i}$ correspond à la fréquence pour le recepteur de la station $i$.
+              \item $fr_{i}$ correspond à la fréquence pour le récepteur de la station $i$.
             \end{itemize}
       \item $D = \{d_{fe_i}, d_{fr_i} | \forall i \in \{1,2,...,n\} \}$ où, $\forall i \in \{1,2,...,n\}$
             \begin{itemize}
-              \item $d_{fe_i}$ correspond à l'ensemble des valeurs de fréquences possibles pour la fréquence émetrice de la station $i$. Cet ensemble de valeur se retrouve dans le fichier de données.
-              \item $d_{fr_i}$ correspond à l'ensemble des valeurs de fréquences possibles pour la fréquence receptrice de la station $i$. Cet ensemble de valeur se retrouve dans le fichier de données.
+              \item $d_{fe_i}$ correspond à l'ensemble des valeurs de fréquences possible pour la fréquence émetrice de la station $i$. Cet ensemble de valeur se retrouve dans le fichier de données.
+              \item $d_{fr_i}$ correspond à l'ensemble des valeurs de fréquences possible pour la fréquence réceptrice de la station $i$. Cet ensemble de valeurs se retrouve dans le fichier de données.
             \end{itemize}
       \item $W$ :
             \begin{itemize}
               \item L'écart entre les deux fréquences d'une même station doit être $\delta_{i}$ pour toute sation $i$ :
                $| fe_{i} - fr_{i} | = \delta{i}$ $\rightarrow$ \color{green} 0 \color{red} + $\infty$ \color{black}
 
-               \item L'écart minimum à garantir entre les fréquences des stations $i$ et $j$. Pour cette contrainte, on a différentier le cas où les stations $i$ et $j$ sont en liaisons et le cas où elles ne le sont pas :
+               \item L'écart minimum à garantir entre les fréquences des stations $i$ et $j$. Pour cette contrainte, on a différencié le cas où les stations $i$ et $j$ sont en liaisons et le cas où elles ne le sont pas :
                \begin{itemize}
                  \item Si $i$ et $j$ sont en liaisons (on est face à des contraintes dures) :
                        \begin{itemize}
@@ -280,7 +282,7 @@
                          \item $| fr_i - fe_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{+\infty}$
                          \item $| fr_i - fr_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{+\infty}$
                        \end{itemize}
-                  \item Si les stations $i$ et $j$ ne sont pas forcément en liaisons, on passe sur des contraintes douces car on estime que les interferences on moins d'impacte puisque les stations ne rentrent pas en communication. Le poids d'une contrainte violé est $\Delta_{i,j}$ car on souhaite que plus l'écart demandé est grand, plus la contrante doit être satisfaite.
+                  \item Si les stations $i$ et $j$ ne sont pas forcément en liaison, on passe sur des contraintes douces car on estime que les interferences ont moins d'impacte puisque les stations ne rentrent pas en communication. Le poids d'une contrainte violée est $\Delta_{i,j}$ car on souhaite que plus l'écart demandé est grand, plus la contrante doit être satisfaite.
                         \begin{itemize}
                           \item $| fe_i - fe_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{\Delta_{i,j}}$
                           \item $| fe_i - fr_j | \geq \Delta_{i,j} \rightarrow \textcolor{green}{0}, \textcolor{red}{\Delta_{i,j}}$
@@ -289,7 +291,7 @@
                         \end{itemize}
                \end{itemize}
 
-               \item Si les stations $i$ et $j$ doivent pouvoir communiquer, on impose que la fréquence receptrice de l'une soit la fréquence emetrice de l'une, et inversement. On est donc face à une contrainte dure :
+               \item Si les stations $i$ et $j$ doivent pouvoir communiquer, on impose que la fréquence réceptrice de l'une soit la fréquence émetrice de l'autre, et inversement. On est donc face à une contrainte dure :
                $fr_i = fe_j$ et $fe_i = fr_j$ $\rightarrow$ \textcolor{green}{0}, \textcolor{red}{+$\infty$}
             \end{itemize}
         \item $SV = (\mathbb{N} \cup \{ + \infty \}, \leq, +, 0, +\infty)$
