@@ -41,7 +41,7 @@
   \tableofcontents
   \newpage
 
-  \section{Problèmes d'optimisation sous contraintes}
+  \section{Problèmes d'optimisation sous contraintes (COP)}
 
     \subsection{Modélisation du problème}
 
@@ -122,123 +122,189 @@
 
     \subsection{Résultats d'expériences}
 
+      Pour ces expériences, nous avons utilisées un ordinateur avec la configuration matériel suivante :
+      \begin{itemize}
+        \item CPU : 16 GB
+        \item Taille de la RAM (mémoire) : i5-12450H  (jusqu'à 4.4GHz)
+      \end{itemize}
+
+      Nous avons choisi d'utiliser le langage python, en utilisant la bibliothèque PyCSP3 permettant la modélisation et la résolution des COP. Concernant la résolution, nous avons décidé d'utiliser deux solveurs différents. Le premier étant le solveur choco, le deuxième étant le solveur ace. Ce sont deux solveurs disponibles dans la bibliothèque PyCSP3. Pour des questions pratiques, nous avons limité les temps d'exécution à 10 minutes par instances et par solveurs.
+
       \subsection{Valeur}
 
-      Est-ce que ça vaut le coup de donné les valeurs des fonctions objectif ?? (si oui je te ferai le tableau) Mais genre on dit quoi dessus mdr ?
+        Nous avons réunis les valeurs des fonctions objectifs dans le tableaux qui suit, en fonction des cas. Ces valeurs sont identiques quelques soit le solveur utilisé puisque utilisons des solutions complètes qui ne dépendent donc uniquement des données, et non de la méthode de résolution. \\
+        Le tableau est découpé en quatre paquet de ligne. Le premier paquet de ligne correspond à des intances avec 150 stations et 15 régions. Le deuxième à des instances avec 250 stations et 25 régions. Le troisième à des instances avec 500 stations et 30 régions. Et pour finir, le dernier paquet correspond à des instances avec 50 stations et 7 régions. \\
+        De plus, les \textcolor[gray]{0.6}{T.O} \textit{(Time Out)} dans le tableau signifie que les solveurs ont été arrêté avant la fin de l'éxecution.
+        \begin{table}[!h]
+          \centering
+          \begin{tabular}{ |c|c|c|c|c| }
+          \hline
+          \textbf{Nom du fichier} & \textbf{CAS 1} & \textcolor[gray]{0.6}{\textbf{CAS 2}}   & \textbf{CAS 2 BIS} & \textbf{CAS 3} \\
+          \hline \hline
+          \scriptsize{150\_13\_15\_5\_0.800000\_26} & 8 & \textcolor[gray]{0.6}{ T.O} & 364 & 350\\
+          \hline
+          \scriptsize{150\_13\_15\_5\_0.800000\_28} & 8 & \textcolor[gray]{0.6}{ T.O} & 462  &  448\\
+          \hline
+          \scriptsize{150\_13\_15\_5\_0.800000\_29} & 8 & \textcolor[gray]{0.6}{ T.O} & 406 &  378\\
+          \hline
+          \scriptsize{150\_13\_15\_5\_0.800000\_2} & 8 & \textcolor[gray]{0.6}{ T.O} & 462 & 448\\
+          \hline
+          \scriptsize{150\_13\_15\_5\_0.800000\_8} & 8 & \textcolor[gray]{0.6}{ T.O} & 378 & 364 \\
+          \hline \hline
+          \scriptsize{250\_25\_15\_5\_0.820000\_20} & 6 & \textcolor[gray]{0.6}{ T.O} &  308 & 294 \\
+          \hline
+          \scriptsize{250\_25\_15\_5\_0.820000\_22} & 8 & \textcolor[gray]{0.6}{ T.O} & 476 & 462\\
+          \hline
+          \scriptsize{250\_25\_15\_5\_0.820000\_5} & 6 & \textcolor[gray]{0.6}{ T.O} & 308 &  294\\
+          \hline
+          \scriptsize{250\_25\_15\_5\_0.820000\_7} & 8 & \textcolor[gray]{0.6}{ T.O} &406  &378  \\
+          \hline
+          \scriptsize{250\_25\_15\_5\_0.820000\_9} & 6 & \textcolor[gray]{0.6}{ T.O} & 308 & 294 \\
+          \hline \hline
+          \scriptsize{500\_30\_20\_5\_0.870000\_24} & 6 & \textcolor[gray]{0.6}{ T.O} & 364&  350\\
+          \hline
+          \scriptsize{500\_30\_20\_5\_0.870000\_29} & 8 & \textcolor[gray]{0.6}{ T.O} & 308  &  294\\
+          \hline
+          \scriptsize{500\_30\_20\_5\_0.870000\_45} & 8 & \textcolor[gray]{0.6}{ T.O} & 406  & 392\\
+          \hline
+          \scriptsize{500\_30\_20\_5\_0.870000\_48} & \textcolor[gray]{0.6}{ T.O} & \textcolor[gray]{0.6}{ T.O} & 308 &  294\\
+          \hline \hline
+          \scriptsize{50\_7\_10\_5\_0.800000\_0} & 6 & \textcolor[gray]{0.6}{ T.O} &350  & 336 \\
+          \hline
+          \scriptsize{50\_7\_10\_5\_0.800000\_1} & 6 & \textcolor[gray]{0.6}{ T.O} & 378 & 364 \\
+          \hline
+          \scriptsize{50\_7\_10\_5\_0.800000\_6} & 6 & \textcolor[gray]{0.6}{ T.O} & 378 & 364 \\
+          \hline
+          \scriptsize{50\_7\_10\_5\_0.800000\_7} & 6 & \textcolor[gray]{0.6}{ T.O} & 280 &  238\\
+          \hline
+          \scriptsize{50\_7\_10\_5\_0.800000\_8} & 6 & \textcolor[gray]{0.6}{ T.O }&280 & 252 \\
+          \hline
+          \end{tabular}
+          \caption{Valeurs des fonctions objectifs des expérimentations}
+        \end{table}
+        \newpage
 
-      En vrai ça peut rajouter quelque chose en plus mais pas obligé. Peut être pour montrer dans chaque cas un compromis temps d'execution/valeur de fonction objectif et faire une petite phrase dessus
+        Raisonnons cas par cas.
+        \begin{itemize}
+          \item \textbf{CAS1}. On remarque que seulement deux valeurs différentes apparaissent : $6$ et $8$. Pour rappel, dans ce cas nous souhaitions minimiser le nombre de fréquences utilisées. Ainsi, ces valeurs correspondent aux nombre de fréquences utilisées pour l'instance concernée.
+          Il est étonnant de voir que celà ne semble pas dépendre du nombre de stations. En effet, même avec 500 stations on arrive à utiliser seulement $6$ fréquences différentes. Nous avions imaginé que plus on a de stations, plus on aurait besoin d'utiliser un nombre de fréquences grand au vue des possibles conflits. Mais finalement, ce sont les conflits qui vont définir le nombre de fréquences nécessaire, et le nombre de conflit n'est pas en lien direct avec le nombre de stations, ce qui explique pourquoi, avec le recul, les résultats ne sont pas si étonnant.
+          \item \textbf{CAS2}. Dans ce cas là, malheureusement, aucune exécution n'a abouti.
+          \item \textbf{CAS2BIS}. Dans ce cas là, nous souhaitions utilisées les valeurs de fréquences les plus basses. Les valeurs du tableau indique quelle est la plus grande valeurs de fréquence utilisée pour l'instance correspondante. Encore une fois, on retrouve parfois des valeurs similaires, indépendemment du nombre de stations et/ou du nombre de régions. Celà est beaucoup moins étonnant puisque les domaines de valeurs n'en dépendentes pas.
+          \item \textbf{CAS3}. L'objectif de ce dernier cas était de minimiser la largeur de la bande de fréquences utilisées. Ainsi, les valeurs du tableau représente l'écart entre la plus basse et la plus haute fréquence utilisées. Encore une fois, on ne retrouve pas un \textit{pattern} particulier en fonction des instances. 
+        \end{itemize}
+
 
       \subsubsection{Temps d'execution}
 
-      Nous avons réuni dans les tableaux suivant les temps d'exécution pour les 4 cas différentes. Le tableau de gauche correspond aux temps d'execution lorsqu'on utilise le solveur choco, tandis que le tableau de droite correspond au solveur ace. Il est important de préciser que nous avons limité le temps d'exécuton à 10 minutes.
+        Nous avons réuni dans les tableaux suivant les temps d'exécution pour les 4 cas différentes. Le tableau de gauche correspond aux temps d'execution lorsqu'on utilise le solveur choco, tandis que le tableau de droite correspond au solveur ace. Il est important de préciser que nous avons limité le temps d'exécuton à 10 minutes.
 
-      \begin{minipage}[t]{0.5\linewidth}
-        \footnotesize
-        \begin{tabular}{ |c|c|c|c|c| }
-          \hline
-          \textbf{Nom du fichier} & \textbf{CAS 1} & \textcolor[gray]{0.6}{\textbf{CAS 2}}   & \textbf{CAS 2 BIS} & \textbf{CAS 3} \\
-          \hline
-          \scriptsize{150\_13\_15\_5\_0.800000\_26} & \textcolor{red}{9,114s} & \textcolor[gray]{0.6}{ 10m0,003s} & 1,875s& \textcolor{green}{1,775s}\\
-          \hline
-          \scriptsize{150\_13\_15\_5\_0.800000\_28} & \textcolor{red}{8,746s} & \textcolor[gray]{0.6}{ 10m0,003s} & \textcolor{green}{1,768s} & 2,177s \\
-          \hline
-          \scriptsize{150\_13\_15\_5\_0.800000\_29} &\textcolor{red}{ 23,106s} & \textcolor[gray]{0.6}{ 10m0,003s} & \textcolor{green}{2,432s} & 9,770s \\
-          \hline
-          \scriptsize{150\_13\_15\_5\_0.800000\_2} & \textcolor{red}{9,103s} & \textcolor[gray]{0.6}{ 10m0,003s} & 3,863s & \textcolor{green}{4,869s} \\
-          \hline
-          \scriptsize{150\_13\_15\_5\_0.800000\_8} & 14,385s & \textcolor[gray]{0.6}{ 10m0,006s} & \textcolor{green}{8,735s} & \textcolor{red}{14,841s}\\
-          \hline
-          \scriptsize{250\_25\_15\_5\_0.820000\_20} & \textcolor{red}{20,851s} & \textcolor[gray]{0.6}{ 10m0,003s} & \textcolor{green}{12,317s} & 15,637s \\
-          \hline
-          \scriptsize{250\_25\_15\_5\_0.820000\_22} &\textcolor{red}{ 21,368s} & \textcolor[gray]{0.6}{ 10m0,014s} & \textcolor{green}{10,138s} & 15,675s \\
-          \hline
-          \scriptsize{250\_25\_15\_5\_0.820000\_5} & \textcolor{red}{24,417s} & \textcolor[gray]{0.6}{ 10m0,004s} & \textcolor{green}{13,985s} & 18,861s \\
-          \hline
-          \scriptsize{250\_25\_15\_5\_0.820000\_7} & \textcolor{red}{1m25,918s} & \textcolor[gray]{0.6}{ 10m0,009s} & \textcolor{green}{17,085s} & 23,151s \\
-          \hline
-          \scriptsize{250\_25\_15\_5\_0.820000\_9} & \textcolor{red}{30,516s} & \textcolor[gray]{0.6}{ 10m0,004s} & \textcolor{green}{12,427s} & 16,081s\\
-          \hline
-          \scriptsize{500\_30\_20\_5\_0.870000\_24} & \textcolor{red}{1m5,376s} & \textcolor[gray]{0.6}{ 10m0,008s} & \textcolor{green}{22,674s} & 32,296s \\
-          \hline
-          \scriptsize{500\_30\_20\_5\_0.870000\_29} & \textcolor{red}{1m48,111s} & \textcolor[gray]{0.6}{ 10m0,009s} & \textcolor{green}{23,076s} & 1m4,631s \\
-          \hline
-          \scriptsize{500\_30\_20\_5\_0.870000\_45} & \textcolor{red}{1m37,911s} & \textcolor[gray]{0.6}{ 10m0,008s} & \textcolor{green}{18,963s} & 44,055s \\
-          \hline
-          \scriptsize{500\_30\_20\_5\_0.870000\_48} & \textcolor[gray]{0.6}{10m0,016s} & \textcolor[gray]{0.6}{ 10m0,017s} & \textcolor{green}{21,797s} & \textcolor{red}{50,926s} \\
-          \hline
-          \scriptsize{50\_7\_10\_5\_0.800000\_0} &\textcolor{red}{ 15,259s} & \textcolor[gray]{0.6}{ 10m0,003s} & \textcolor{green}{7,826s} & 10,754s \\
-          \hline
-          \scriptsize{50\_7\_10\_5\_0.800000\_1} & 14,113s & \textcolor[gray]{0.6}{ 10m0,067s} & \textcolor{green}{8,736s} & \textcolor{red}{21,748s} \\
-          \hline
-          \scriptsize{50\_7\_10\_5\_0.800000\_6} & \textcolor{red}{12,067s} & \textcolor[gray]{0.6}{ 10m0,071s} & \textcolor{green}{6,799s} & 7,601s \\
-          \hline
-          \scriptsize{50\_7\_10\_5\_0.800000\_7} & \textcolor{red}{28,409s} & \textcolor[gray]{0.6}{ 10m0,006s} & \textcolor{green}{7,375s} & 8,325s \\
-          \hline
-          \scriptsize{50\_7\_10\_5\_0.800000\_8} & \textcolor{red}{13,511s} & \textcolor[gray]{0.6}{ 10m0,003s }& 8,190s & \textcolor{green}{7,660s} \\
-          \hline
-        \end{tabular}
-        ~\\
-        \centering
-        \textbf{\large Tableau des résultats avec le solveur Choco} % C'est le titre de la minipage
-      \end{minipage}
-      \hfill
-     \begin{minipage}[t]{0.6\linewidth}
-       \footnotesize
-         \begin{tabular}{ |c|c|c|c|c| }
-           \hline
-           \textbf{Nom du fichier} & \textbf{CAS 1} &\textcolor[gray]{0.6}{ \textbf{CAS 2}} & \textbf{CAS 2 BIS} & \textbf{CAS 3} \\
-           \hline
-           \scriptsize{150\_13\_15\_5\_0.800000\_26} & \textcolor{red}{9,148s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{1,934s} & 2,080s\\
-           \hline
-           \scriptsize{150\_13\_15\_5\_0.800000\_28} & \textbf{\textcolor{red}{7,527s}} & \textcolor[gray]{0.6}{10m0,003 }& \textcolor{green}{2,045s} & 2,819s \\
-           \hline
-           \scriptsize{150\_13\_15\_5\_0.800000\_29} & \textcolor{red}{38,114s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{3,033s} & \textbf{8,701s} \\
-           \hline
-           \scriptsize{150\_13\_15\_5\_0.800000\_2} & \textcolor{red}{11,311s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{6,704s} & 8,018s \\
-           \hline
-           \scriptsize{150\_13\_15\_5\_0.800000\_8} & \textcolor{red}{19,314s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{9,039s} & 16,969s \\
-           \hline
-           \scriptsize{250\_25\_15\_5\_0.820000\_20} & \textcolor{red}{22,871s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{12,827s} & 15,720s \\
-           \hline
-           \scriptsize{250\_25\_15\_5\_0.820000\_22} & \textbf{\textcolor{red}{20,711s}} & \textcolor[gray]{0.6}{10m0,040s} & \textcolor{green}{13,023s} & 17,823s \\
-           \hline
-           \scriptsize{250\_25\_15\_5\_0.820000\_5} & \textbf{\textcolor{red}{21,584s}} & \textcolor[gray]{0.6}{10m0,003 }& \textbf{\textcolor{green}{13,005s}} & \textbf{15,649s} \\
-           \hline
-           \scriptsize{250\_25\_15\_5\_0.820000\_7} & \textbf{\textcolor{red}{1m19,278s}}& \textcolor[gray]{0.6}{10m0,004s} &\textbf{ \textcolor{green}{11,586s}} & \textbf{21,511s} \\
-           \hline
-           \scriptsize{250\_25\_15\_5\_0.820000\_9} & \textbf{\textcolor{red}{29,120s}} & \textcolor[gray]{0.6}{10m0,017s} & \textcolor{green}{14,780s} & 20,984s \\
-           \hline
-           \scriptsize{500\_30\_20\_5\_0.870000\_24} & \textcolor{red}{1m17,392s} & \textcolor[gray]{0.6}{10m0,069s} & \textcolor{green}{23,233s} & 36,927s \\
-           \hline
-           \scriptsize{500\_30\_20\_5\_0.870000\_29} & \textcolor{red}{1m37,635s} & \textcolor[gray]{0.6}{10m0,008s} & \textcolor{green}{18,379s} & 49,842s \\
-           \hline
-           \scriptsize{500\_30\_20\_5\_0.870000\_45} & \textcolor{red}{1m42,731s} & \textcolor[gray]{0.6}{10m0,018s} & 1m2,116s & \textcolor{green}{51,214s} \\
-           \hline
-           \scriptsize{500\_30\_20\_5\_0.870000\_48} & \textcolor[gray]{0.6}{10m0,011s} & \textcolor[gray]{0.6}{10m0,009s} &  \textcolor{green}{22,408s} & \textbf{\textcolor{red}{43,302s}} \\
-           \hline
-           \scriptsize{50\_7\_10\_5\_0.800000\_0} &\textbf{ \textcolor{red}{12,524s}} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{8,766s} & \textbf{10,333s} \\
-           \hline
-           \scriptsize{50\_7\_10\_5\_0.800000\_1} & \textbf{13,005s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{8,972s} & \textbf{\textcolor{red}{19,113s}} \\
-           \hline
-           \scriptsize{50\_7\_10\_5\_0.800000\_6} & \textcolor{red}{37,418s} & \textcolor[gray]{0.6}{10m0,073s} & \textbf{\textcolor{green}{6,258s}} & \textbf{7,170s} \\
-           \hline
-           \scriptsize{50\_7\_10\_5\_0.800000\_7} & \textbf{\textcolor{red}{23,807s}} & \textcolor[gray]{0.6}{10m0,007s} & \textcolor{green}{8,416s} & \textbf{10,006s} \\
-           \hline
-           \scriptsize{50\_7\_10\_5\_0.800000\_8} & \textbf{\textcolor{red}{12,348s}} & \textcolor[gray]{0.6}{10m0,068s} & \textbf{7,770s} & \textcolor{green}{7,660s} \\
-           \hline
-         \end{tabular}
-       ~\\\\
-       \centering
-       \textbf{\large Tableau des résultats avec le solveur Ace} % C'est le titre de la minipage
-     \end{minipage}
+        \begin{minipage}[t]{0.5\linewidth}
+          \footnotesize
+          \begin{tabular}{ |c|c|c|c|c| }
+            \hline
+            \textbf{Nom du fichier} & \textbf{CAS 1} & \textcolor[gray]{0.6}{\textbf{CAS 2}}   & \textbf{CAS 2 BIS} & \textbf{CAS 3} \\
+            \hline
+            \scriptsize{150\_13\_15\_5\_0.800000\_26} & \textcolor{red}{9,114s} & \textcolor[gray]{0.6}{ 10m0,003s} & 1,875s& \textcolor{green}{1,775s}\\
+            \hline
+            \scriptsize{150\_13\_15\_5\_0.800000\_28} & \textcolor{red}{8,746s} & \textcolor[gray]{0.6}{ 10m0,003s} & \textcolor{green}{1,768s} & 2,177s \\
+            \hline
+            \scriptsize{150\_13\_15\_5\_0.800000\_29} &\textcolor{red}{ 23,106s} & \textcolor[gray]{0.6}{ 10m0,003s} & \textcolor{green}{2,432s} & 9,770s \\
+            \hline
+            \scriptsize{150\_13\_15\_5\_0.800000\_2} & \textcolor{red}{9,103s} & \textcolor[gray]{0.6}{ 10m0,003s} & 3,863s & \textcolor{green}{4,869s} \\
+            \hline
+            \scriptsize{150\_13\_15\_5\_0.800000\_8} & 14,385s & \textcolor[gray]{0.6}{ 10m0,006s} & \textcolor{green}{8,735s} & \textcolor{red}{14,841s}\\
+            \hline
+            \scriptsize{250\_25\_15\_5\_0.820000\_20} & \textcolor{red}{20,851s} & \textcolor[gray]{0.6}{ 10m0,003s} & \textcolor{green}{12,317s} & 15,637s \\
+            \hline
+            \scriptsize{250\_25\_15\_5\_0.820000\_22} &\textcolor{red}{ 21,368s} & \textcolor[gray]{0.6}{ 10m0,014s} & \textcolor{green}{10,138s} & 15,675s \\
+            \hline
+            \scriptsize{250\_25\_15\_5\_0.820000\_5} & \textcolor{red}{24,417s} & \textcolor[gray]{0.6}{ 10m0,004s} & \textcolor{green}{13,985s} & 18,861s \\
+            \hline
+            \scriptsize{250\_25\_15\_5\_0.820000\_7} & \textcolor{red}{1m25,918s} & \textcolor[gray]{0.6}{ 10m0,009s} & \textcolor{green}{17,085s} & 23,151s \\
+            \hline
+            \scriptsize{250\_25\_15\_5\_0.820000\_9} & \textcolor{red}{30,516s} & \textcolor[gray]{0.6}{ 10m0,004s} & \textcolor{green}{12,427s} & 16,081s\\
+            \hline
+            \scriptsize{500\_30\_20\_5\_0.870000\_24} & \textcolor{red}{1m5,376s} & \textcolor[gray]{0.6}{ 10m0,008s} & \textcolor{green}{22,674s} & 32,296s \\
+            \hline
+            \scriptsize{500\_30\_20\_5\_0.870000\_29} & \textcolor{red}{1m48,111s} & \textcolor[gray]{0.6}{ 10m0,009s} & \textcolor{green}{23,076s} & 1m4,631s \\
+            \hline
+            \scriptsize{500\_30\_20\_5\_0.870000\_45} & \textcolor{red}{1m37,911s} & \textcolor[gray]{0.6}{ 10m0,008s} & \textcolor{green}{18,963s} & 44,055s \\
+            \hline
+            \scriptsize{500\_30\_20\_5\_0.870000\_48} & \textcolor[gray]{0.6}{10m0,016s} & \textcolor[gray]{0.6}{ 10m0,017s} & \textcolor{green}{21,797s} & \textcolor{red}{50,926s} \\
+            \hline
+            \scriptsize{50\_7\_10\_5\_0.800000\_0} &\textcolor{red}{ 15,259s} & \textcolor[gray]{0.6}{ 10m0,003s} & \textcolor{green}{7,826s} & 10,754s \\
+            \hline
+            \scriptsize{50\_7\_10\_5\_0.800000\_1} & 14,113s & \textcolor[gray]{0.6}{ 10m0,067s} & \textcolor{green}{8,736s} & \textcolor{red}{21,748s} \\
+            \hline
+            \scriptsize{50\_7\_10\_5\_0.800000\_6} & \textcolor{red}{12,067s} & \textcolor[gray]{0.6}{ 10m0,071s} & \textcolor{green}{6,799s} & 7,601s \\
+            \hline
+            \scriptsize{50\_7\_10\_5\_0.800000\_7} & \textcolor{red}{28,409s} & \textcolor[gray]{0.6}{ 10m0,006s} & \textcolor{green}{7,375s} & 8,325s \\
+            \hline
+            \scriptsize{50\_7\_10\_5\_0.800000\_8} & \textcolor{red}{13,511s} & \textcolor[gray]{0.6}{ 10m0,003s }& 8,190s & \textcolor{green}{7,660s} \\
+            \hline
+          \end{tabular}
+          ~\\
+          \centering
+          \textbf{\large Tableau des résultats avec le solveur Choco} % C'est le titre de la minipage
+        \end{minipage}
+        \hfill
+       \begin{minipage}[t]{0.6\linewidth}
+         \footnotesize
+           \begin{tabular}{ |c|c|c|c|c| }
+             \hline
+             \textbf{Nom du fichier} & \textbf{CAS 1} &\textcolor[gray]{0.6}{ \textbf{CAS 2}} & \textbf{CAS 2 BIS} & \textbf{CAS 3} \\
+             \hline
+             \scriptsize{150\_13\_15\_5\_0.800000\_26} & \textcolor{red}{9,148s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{1,934s} & 2,080s\\
+             \hline
+             \scriptsize{150\_13\_15\_5\_0.800000\_28} & \textbf{\textcolor{red}{7,527s}} & \textcolor[gray]{0.6}{10m0,003 }& \textcolor{green}{2,045s} & 2,819s \\
+             \hline
+             \scriptsize{150\_13\_15\_5\_0.800000\_29} & \textcolor{red}{38,114s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{3,033s} & \textbf{8,701s} \\
+             \hline
+             \scriptsize{150\_13\_15\_5\_0.800000\_2} & \textcolor{red}{11,311s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{6,704s} & 8,018s \\
+             \hline
+             \scriptsize{150\_13\_15\_5\_0.800000\_8} & \textcolor{red}{19,314s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{9,039s} & 16,969s \\
+             \hline
+             \scriptsize{250\_25\_15\_5\_0.820000\_20} & \textcolor{red}{22,871s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{12,827s} & 15,720s \\
+             \hline
+             \scriptsize{250\_25\_15\_5\_0.820000\_22} & \textbf{\textcolor{red}{20,711s}} & \textcolor[gray]{0.6}{10m0,040s} & \textcolor{green}{13,023s} & 17,823s \\
+             \hline
+             \scriptsize{250\_25\_15\_5\_0.820000\_5} & \textbf{\textcolor{red}{21,584s}} & \textcolor[gray]{0.6}{10m0,003 }& \textbf{\textcolor{green}{13,005s}} & \textbf{15,649s} \\
+             \hline
+             \scriptsize{250\_25\_15\_5\_0.820000\_7} & \textbf{\textcolor{red}{1m19,278s}}& \textcolor[gray]{0.6}{10m0,004s} &\textbf{ \textcolor{green}{11,586s}} & \textbf{21,511s} \\
+             \hline
+             \scriptsize{250\_25\_15\_5\_0.820000\_9} & \textbf{\textcolor{red}{29,120s}} & \textcolor[gray]{0.6}{10m0,017s} & \textcolor{green}{14,780s} & 20,984s \\
+             \hline
+             \scriptsize{500\_30\_20\_5\_0.870000\_24} & \textcolor{red}{1m17,392s} & \textcolor[gray]{0.6}{10m0,069s} & \textcolor{green}{23,233s} & 36,927s \\
+             \hline
+             \scriptsize{500\_30\_20\_5\_0.870000\_29} & \textcolor{red}{1m37,635s} & \textcolor[gray]{0.6}{10m0,008s} & \textcolor{green}{18,379s} & 49,842s \\
+             \hline
+             \scriptsize{500\_30\_20\_5\_0.870000\_45} & \textcolor{red}{1m42,731s} & \textcolor[gray]{0.6}{10m0,018s} & 1m2,116s & \textcolor{green}{51,214s} \\
+             \hline
+             \scriptsize{500\_30\_20\_5\_0.870000\_48} & \textcolor[gray]{0.6}{10m0,011s} & \textcolor[gray]{0.6}{10m0,009s} &  \textcolor{green}{22,408s} & \textbf{\textcolor{red}{43,302s}} \\
+             \hline
+             \scriptsize{50\_7\_10\_5\_0.800000\_0} &\textbf{ \textcolor{red}{12,524s}} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{8,766s} & \textbf{10,333s} \\
+             \hline
+             \scriptsize{50\_7\_10\_5\_0.800000\_1} & \textbf{13,005s} & \textcolor[gray]{0.6}{10m0,003s} & \textcolor{green}{8,972s} & \textbf{\textcolor{red}{19,113s}} \\
+             \hline
+             \scriptsize{50\_7\_10\_5\_0.800000\_6} & \textcolor{red}{37,418s} & \textcolor[gray]{0.6}{10m0,073s} & \textbf{\textcolor{green}{6,258s}} & \textbf{7,170s} \\
+             \hline
+             \scriptsize{50\_7\_10\_5\_0.800000\_7} & \textbf{\textcolor{red}{23,807s}} & \textcolor[gray]{0.6}{10m0,007s} & \textcolor{green}{8,416s} & \textbf{10,006s} \\
+             \hline
+             \scriptsize{50\_7\_10\_5\_0.800000\_8} & \textbf{\textcolor{red}{12,348s}} & \textcolor[gray]{0.6}{10m0,068s} & \textbf{7,770s} & \textcolor{green}{7,660s} \\
+             \hline
+           \end{tabular}
+         ~\\\\
+         \centering
+         \textbf{\large Tableau des résultats avec le solveur Ace} % C'est le titre de la minipage
+       \end{minipage}
 
-     Nous avons mis en gris les temps correspondant à des non-aboutissements, c'est-à-dire que le processus a été arrêté en cours d'exécution, au bout de 10 minutes.
+       Nous avons mis en gris les temps correspondant à des non-aboutissements, c'est-à-dire que le processus a été arrêté en cours d'exécution, au bout de 10 minutes.
 
-     \begin{itemize}
-       \item Concernant le \textit{CAS 2}, nous observons une absence totale de résultats aboutis. Cette situation contraste fortement avec le \textit{CAS 2 BIS}, qui a systématiquement abouti à des résultats. Cette différence pourrait suggérer que la fonction objectif définie dans le \textit{CAS 2} est soit mal adaptée, soit trop complexe pour être traitée efficacement par le solveur utilisé. Cette distinction entre les deux cas souligne l'importance d'une formulation adéquate de la fonction objectif dans la résolution de problèmes de programmation sous contrainte.
-       \item Généralement, on remarque que le solveur Choco est plus efficace en terme de temps que le solveur Ace. Les valeurs dans le tableau de droite sont en gras lorsque le temps d'exécution est plus faible en utilisant le solveur Ace qu'en utilisant le solveur choco.
-       \item On peut voir que dans la plus part des instances, le \textit{CAS 2 BIS} à le plus faible temps d'exécution.
-     \end{itemize}
+       \begin{itemize}
+         \item Concernant le \textit{CAS 2}, nous observons une absence totale de résultats aboutis. Cette situation contraste fortement avec le \textit{CAS 2 BIS}, qui a systématiquement abouti à des résultats. Cette différence pourrait suggérer que la fonction objectif définie dans le \textit{CAS 2} est soit mal adaptée, soit trop complexe pour être traitée efficacement par le solveur utilisé. Cette distinction entre les deux cas souligne l'importance d'une formulation adéquate de la fonction objectif dans la résolution de problèmes de programmation sous contrainte.
+         \item Généralement, on remarque que le solveur Choco est plus efficace en terme de temps que le solveur Ace. Les valeurs dans le tableau de droite sont en gras lorsque le temps d'exécution est plus faible en utilisant le solveur Ace qu'en utilisant le solveur choco.
+         \item On peut voir que dans la plus part des instances, le \textit{CAS 2 BIS} à le plus faible temps d'exécution.
+       \end{itemize}
 
 
 
