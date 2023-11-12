@@ -130,7 +130,7 @@
 
       Nous avons choisi d'utiliser le langage python, en utilisant la bibliothèque PyCSP3 permettant la modélisation et la résolution des COP. Concernant la résolution, nous avons décidé d'utiliser deux solveurs différents. Le premier étant le solveur choco, le deuxième étant le solveur ace. Ce sont deux solveurs disponibles dans la bibliothèque PyCSP3. Pour des questions pratiques, nous avons limité les temps d'exécution à 10 minutes par instances et par solveurs.
 
-      \subsection{Valeur}
+      \subsubsection{Valeur}
 
         Nous avons réunis les valeurs des fonctions objectifs dans le tableaux qui suit, en fonction des cas. Ces valeurs sont identiques quelques soit le solveur utilisé puisque utilisons des solutions complètes qui ne dépendent donc uniquement des données, et non de la méthode de résolution. \\
         Le tableau est découpé en quatre paquet de ligne. Le premier paquet de ligne correspond à des intances avec 150 stations et 15 régions. Le deuxième à des instances avec 250 stations et 25 régions. Le troisième à des instances avec 500 stations et 30 régions. Et pour finir, le dernier paquet correspond à des instances avec 50 stations et 7 régions. \\
@@ -190,7 +190,7 @@
           Il est étonnant de voir que celà ne semble pas dépendre du nombre de stations. En effet, même avec 500 stations on arrive à utiliser seulement $6$ fréquences différentes. Nous avions imaginé que plus on a de stations, plus on aurait besoin d'utiliser un nombre de fréquences grand au vue des possibles conflits. Mais finalement, ce sont les conflits qui vont définir le nombre de fréquences nécessaire, et le nombre de conflit n'est pas en lien direct avec le nombre de stations, ce qui explique pourquoi, avec le recul, les résultats ne sont pas si étonnant.
           \item \textbf{CAS2}. Dans ce cas là, malheureusement, aucune exécution n'a abouti.
           \item \textbf{CAS2BIS}. Dans ce cas là, nous souhaitions utilisées les valeurs de fréquences les plus basses. Les valeurs du tableau indique quelle est la plus grande valeurs de fréquence utilisée pour l'instance correspondante. Encore une fois, on retrouve parfois des valeurs similaires, indépendemment du nombre de stations et/ou du nombre de régions. Celà est beaucoup moins étonnant puisque les domaines de valeurs n'en dépendentes pas.
-          \item \textbf{CAS3}. L'objectif de ce dernier cas était de minimiser la largeur de la bande de fréquences utilisées. Ainsi, les valeurs du tableau représente l'écart entre la plus basse et la plus haute fréquence utilisées. Encore une fois, on ne retrouve pas un \textit{pattern} particulier en fonction des instances. 
+          \item \textbf{CAS3}. L'objectif de ce dernier cas était de minimiser la largeur de la bande de fréquences utilisées. Ainsi, les valeurs du tableau représente l'écart entre la plus basse et la plus haute fréquence utilisées. Encore une fois, on ne retrouve pas un \textit{pattern} particulier en fonction des instances.
         \end{itemize}
 
 
